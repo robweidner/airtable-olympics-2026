@@ -1,25 +1,25 @@
-// Table and field name constants
-// Prevents magic string typos and makes refactoring safe
+// Table and field ID constants
+// Using IDs instead of names for stability - names can change, IDs don't
 
-export const TABLE_NAMES = {
-  PLAYERS: 'Players',
-  COUNTRIES: 'Countries',
-  EVENTS: 'Events',
-  PICKS: 'Picks',
-  SPORTS: 'Sports',
+export const TABLE_IDS = {
+  PLAYERS: 'tblGi2GCOESm9ZIoT',
+  COUNTRIES: 'tblj00SBSlV3Nihaz',
+  EVENTS: 'tblfcCI7cZqIc06qD',
+  PICKS: 'tblqQv8qrZXulR28g',
+  SPORTS: 'tbl9zaGk0SPF4ru5I',
 };
 
-export const FIELD_NAMES = {
+export const FIELD_IDS = {
   PLAYERS: {
-    NAME: 'Name',
-    TOTAL_SCORE: 'Total Score',
+    NAME: 'fldrRQK2luH5JTkRV',
+    TOTAL_SCORE: 'fldwIM37gcLm15F5K',
   },
   COUNTRIES: {
-    NAME: 'Name',
-    NOC: 'NOC',
-    GOLD_MEDALS: 'Gold Medals',
-    SILVER_MEDALS: 'Silver Medals',
-    BRONZE_MEDALS: 'Bronze Medals',
-    TOTAL_MEDALS: 'Total Medals',
+    NAME: 'fldLAMQHm8YUtu8gO',           // "Country"
+    NOC: 'fldIrQbjNeEdzFsxE',             // "NOC Code"
+    GOLD_MEDALS: 'fldpcRbBGQAijPfBk',
+    SILVER_MEDALS: 'fldPyY8PhFcLbpeff',
+    BRONZE_MEDALS: 'fldJKgbz9CNxFlvjQ',
+    TOTAL_MEDALS: 'fldOHM0Ama2hYcc6l',
   },
 };

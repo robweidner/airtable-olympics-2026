@@ -2,23 +2,23 @@
  * MedalCountCard - Displays top 10 countries by medal count
  * Uses field-limited queries and useMemo for performance
  */
-import { useBase, useRecords } from '@airtable/blocks/ui';
+import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo } from 'react';
-import { TABLE_NAMES, FIELD_NAMES } from '../constants';
+import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToCountry } from '../helpers';
 
 const MEDAL_FIELDS = [
-  FIELD_NAMES.COUNTRIES.NAME,
-  FIELD_NAMES.COUNTRIES.NOC,
-  FIELD_NAMES.COUNTRIES.GOLD_MEDALS,
-  FIELD_NAMES.COUNTRIES.SILVER_MEDALS,
-  FIELD_NAMES.COUNTRIES.BRONZE_MEDALS,
-  FIELD_NAMES.COUNTRIES.TOTAL_MEDALS,
+  FIELD_IDS.COUNTRIES.NAME,
+  FIELD_IDS.COUNTRIES.NOC,
+  FIELD_IDS.COUNTRIES.GOLD_MEDALS,
+  FIELD_IDS.COUNTRIES.SILVER_MEDALS,
+  FIELD_IDS.COUNTRIES.BRONZE_MEDALS,
+  FIELD_IDS.COUNTRIES.TOTAL_MEDALS,
 ];
 
 export function MedalCountCard() {
   const base = useBase();
-  const countriesTable = base.getTableByNameIfExists(TABLE_NAMES.COUNTRIES);
+  const countriesTable = base.getTableByIdIfExists(TABLE_IDS.COUNTRIES);
 
   // Fetch only the fields we need
   const records = useRecords(countriesTable, { fields: MEDAL_FIELDS });

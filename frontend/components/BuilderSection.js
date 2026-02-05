@@ -7,8 +7,11 @@
 const SYNC_LINKS = {
   countries: 'https://airtable.com/appoY3nwpfUnUut4P/shr632RQw5PdSJgoY',
   athletes: 'https://airtable.com/appoY3nwpfUnUut4P/shraFpEmwrY7LBjh6',
+  sports: 'https://airtable.com/appoY3nwpfUnUut4P/shrJxONmCYd2i3IAM',
   events: 'https://airtable.com/appoY3nwpfUnUut4P/shrAK9nlSAX51L7S2',
+  players: 'https://airtable.com/appoY3nwpfUnUut4P/shrEwciwYyPOa8oFc',
   results: 'https://airtable.com/appoY3nwpfUnUut4P/shrYpNoFK6wEg2JP6',
+  picks: 'https://airtable.com/appoY3nwpfUnUut4P/shrTXGgyVl0FJ77Sa',
 };
 
 const GITHUB_REPO = 'https://github.com/robweidner/airtable-olympics-2026';
@@ -44,8 +47,11 @@ export function BuilderSection() {
             <div className="space-y-2">
               <SyncLink label="Countries" href={SYNC_LINKS.countries} />
               <SyncLink label="Athletes" href={SYNC_LINKS.athletes} />
+              <SyncLink label="Sports" href={SYNC_LINKS.sports} />
               <SyncLink label="Events" href={SYNC_LINKS.events} />
+              <SyncLink label="Players" href={SYNC_LINKS.players} />
               <SyncLink label="Results" href={SYNC_LINKS.results} />
+              <SyncLink label="Picks" href={SYNC_LINKS.picks} />
             </div>
           </TierCard>
 

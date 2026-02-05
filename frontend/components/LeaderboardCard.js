@@ -2,19 +2,19 @@
  * LeaderboardCard - Displays top 10 fantasy players by score
  * Uses field-limited queries and useMemo for performance
  */
-import { useBase, useRecords } from '@airtable/blocks/ui';
+import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo } from 'react';
-import { TABLE_NAMES, FIELD_NAMES } from '../constants';
+import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToPlayer } from '../helpers';
 
 const PLAYER_FIELDS = [
-  FIELD_NAMES.PLAYERS.NAME,
-  FIELD_NAMES.PLAYERS.TOTAL_SCORE,
+  FIELD_IDS.PLAYERS.NAME,
+  FIELD_IDS.PLAYERS.TOTAL_SCORE,
 ];
 
 export function LeaderboardCard() {
   const base = useBase();
-  const playersTable = base.getTableByNameIfExists(TABLE_NAMES.PLAYERS);
+  const playersTable = base.getTableByIdIfExists(TABLE_IDS.PLAYERS);
 
   // Fetch only the fields we need
   const records = useRecords(playersTable, { fields: PLAYER_FIELDS });
