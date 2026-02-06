@@ -4,15 +4,43 @@
  */
 import { useState } from 'react';
 
-// Sync links for builders (Airtable Share > Sync URLs)
-const SYNC_TABLES = [
-  { label: 'Countries', detail: '90 nations + medal counts', href: 'https://airtable.com/appoY3nwpfUnUut4P/shr632RQw5PdSJgoY' },
-  { label: 'Athletes', detail: '2,470+ competitors', href: 'https://airtable.com/appoY3nwpfUnUut4P/shraFpEmwrY7LBjh6' },
-  { label: 'Sports', detail: '16 disciplines', href: 'https://airtable.com/appoY3nwpfUnUut4P/shrJxONmCYd2i3IAM' },
-  { label: 'Events', detail: '116 medal events', href: 'https://airtable.com/appoY3nwpfUnUut4P/shrAK9nlSAX51L7S2' },
-  { label: 'Results', detail: 'Live \u2014 updates as medals are awarded', href: 'https://airtable.com/appoY3nwpfUnUut4P/shrYpNoFK6wEg2JP6' },
-  { label: 'Players', detail: 'Fantasy leaderboard', href: 'https://airtable.com/appoY3nwpfUnUut4P/shrEwciwYyPOa8oFc' },
-  { label: 'Picks', detail: 'All predictions', href: 'https://airtable.com/appoY3nwpfUnUut4P/shrTXGgyVl0FJ77Sa' },
+// Base ID used to construct share + embed URLs
+const BASE_ID = 'appoY3nwpfUnUut4P';
+
+// Featured tables — shown with embedded Airtable previews
+const FEATURED_TABLES = [
+  {
+    label: 'Results',
+    detail: 'Live — updates as medals are awarded',
+    shareToken: 'shrYpNoFK6wEg2JP6',
+    embedSrc: `https://airtable.com/embed/${BASE_ID}/shrYpNoFK6wEg2JP6?viewControls=on`,
+  },
+  {
+    label: 'Countries',
+    detail: '90 nations + medal counts',
+    shareToken: 'shr632RQw5PdSJgoY',
+    embedSrc: `https://airtable.com/embed/${BASE_ID}/shr632RQw5PdSJgoY?viewControls=on`,
+  },
+  {
+    label: 'Events',
+    detail: '116 medal events',
+    shareToken: 'shrAK9nlSAX51L7S2',
+    embedSrc: `https://airtable.com/embed/${BASE_ID}/shrAK9nlSAX51L7S2?viewControls=on`,
+  },
+  {
+    label: 'Olympic News',
+    detail: 'AI-generated coverage & recaps',
+    shareToken: 'shrOhkwiRrQhB8zCl',
+    embedSrc: `https://airtable.com/embed/${BASE_ID}/shrOhkwiRrQhB8zCl?viewControls=on`,
+  },
+];
+
+// Additional tables — listed in the "More Tables" accordion (no embeds)
+const MORE_TABLES = [
+  { label: 'Athletes', detail: '2,470+ competitors', shareToken: 'shraFpEmwrY7LBjh6' },
+  { label: 'Sports', detail: '16 disciplines', shareToken: 'shrJxONmCYd2i3IAM' },
+  { label: 'Players', detail: 'Fantasy leaderboard', shareToken: 'shrEwciwYyPOa8oFc' },
+  { label: 'Picks', detail: 'All predictions', shareToken: 'shrTXGgyVl0FJ77Sa' },
 ];
 
 const GITHUB_REPO = 'https://github.com/robweidner/airtable-olympics-2026';
@@ -68,14 +96,14 @@ export function BuilderSection() {
               'Live 2026 results as events finish',
               'Full event schedule & country data',
               'Automatic 15-minute refresh',
-              '7 tables available to sync',
+              '8 tables available to sync',
             ]}
           >
             <button
               onClick={() => setShowSyncModal(true)}
               className="block w-full py-2.5 px-4 bg-green-green hover:bg-green-greenDark1 text-white text-center font-medium rounded-md transition-colors"
             >
-              View Sync Links {'\u2192'}
+              Explore the Dataset {'\u2192'}
             </button>
           </TierCard>
 
@@ -162,9 +190,13 @@ export function BuilderSection() {
 }
 
 /**
- * SyncModal - Full-screen overlay with all sync table links
+ * SyncModal - Data Explorer modal with embedded Airtable previews
+ * and sync links. Featured tables show interactive embeds; additional
+ * tables are tucked into an expandable accordion.
  */
 function SyncModal({ onClose }) {
+  const [showMore, setShowMore] = useState(false);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -175,17 +207,17 @@ function SyncModal({ onClose }) {
 
       {/* Modal content */}
       <div
-        className="relative bg-surface rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto"
+        className="relative bg-surface rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-surface border-b border-light px-6 py-4 rounded-t-xl flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-surface border-b border-light px-6 py-4 rounded-t-xl flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-primary">
-              Sync Live Olympic Data
+              Explore &amp; Sync Olympic Data
             </h3>
             <p className="text-sm text-tertiary">
-              Click any table to add it to your base
+              Preview live data below, then sync it to your base.
             </p>
           </div>
           <button
@@ -196,34 +228,110 @@ function SyncModal({ onClose }) {
           </button>
         </div>
 
-        {/* Sync Links */}
-        <div className="p-6 space-y-3">
-          {SYNC_TABLES.map((table) => (
-            <a
-              key={table.label}
-              href={table.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between p-3 bg-green-greenLight3 hover:bg-green-greenLight2 text-green-greenDark1 rounded-lg transition-colors group"
-            >
-              <div>
-                <span className="font-semibold text-sm">{table.label}</span>
-                <span className="block text-xs text-green-green opacity-70 mt-0.5">
-                  {table.detail}
-                </span>
+        {/* Featured table cards with embeds */}
+        <div className="p-6">
+          <div className="space-y-6">
+            {FEATURED_TABLES.map((table) => (
+              <div
+                key={table.label}
+                className="border border-default rounded-lg overflow-hidden bg-surface"
+              >
+                <iframe
+                  src={table.embedSrc}
+                  title={`${table.label} preview`}
+                  width="100%"
+                  height="300"
+                  loading="lazy"
+                  className="border-b border-light"
+                  style={{ background: 'transparent' }}
+                />
+                <div className="p-4">
+                  <h4 className="font-semibold text-primary text-sm">
+                    {table.label}
+                  </h4>
+                  <p className="text-xs text-tertiary mt-0.5 mb-3">
+                    {table.detail}
+                  </p>
+                  <a
+                    href={`https://airtable.com/${BASE_ID}/${table.shareToken}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 py-2 px-4 bg-green-green hover:bg-green-greenDark1 text-white text-sm font-medium rounded-md transition-colors"
+                  >
+                    Sync to My Base {'\u2192'}
+                  </a>
+                </div>
               </div>
-              <span className="text-lg group-hover:translate-x-0.5 transition-transform">
-                {'\u2197'}
-              </span>
-            </a>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Footer hint */}
-        <div className="border-t border-light px-6 py-4 text-center">
-          <p className="text-xs text-muted">
-            Each link opens Airtable&apos;s sync setup. Data refreshes automatically every 15 minutes.
-          </p>
+          {/* Helper text — sync vs copy explanation */}
+          <div className="mt-6 bg-blue-blueLight3 border border-blue-blueLight1 rounded-lg p-4">
+            <p className="text-sm text-blue-blueDark1 font-medium mb-1">
+              Synced table vs. copied data
+            </p>
+            <p className="text-xs text-blue-blue leading-relaxed">
+              When you click &ldquo;Sync to My Base&rdquo;, you&apos;ll choose a
+              workspace and base. Then pick:
+            </p>
+            <ul className="mt-2 space-y-1 text-xs text-blue-blue">
+              <li className="flex items-start gap-1.5">
+                <span className="mt-0.5">{'\u2022'}</span>
+                <span>
+                  <strong>Create a synced table</strong> &mdash; stays up-to-date
+                  automatically (refreshes every 15 min)
+                </span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <span className="mt-0.5">{'\u2022'}</span>
+                <span>
+                  <strong>Copy this data</strong> &mdash; one-time snapshot you can
+                  edit freely
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          {/* More Tables accordion */}
+          <div className="mt-6 border border-default rounded-lg">
+            <button
+              onClick={() => setShowMore((prev) => !prev)}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-primary hover:bg-surface-raised transition-colors rounded-lg"
+            >
+              <span>More Tables</span>
+              <span className="text-tertiary">
+                {showMore ? '\u25BE' : '\u25B8'}
+              </span>
+            </button>
+
+            {showMore && (
+              <div className="border-t border-light">
+                {MORE_TABLES.map((table) => (
+                  <div
+                    key={table.label}
+                    className="flex items-center justify-between px-4 py-3 border-b border-light last:border-b-0"
+                  >
+                    <div>
+                      <span className="text-sm font-medium text-primary">
+                        {table.label}
+                      </span>
+                      <span className="block text-xs text-tertiary mt-0.5">
+                        {table.detail}
+                      </span>
+                    </div>
+                    <a
+                      href={`https://airtable.com/${BASE_ID}/${table.shareToken}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 py-1.5 px-3 bg-green-green hover:bg-green-greenDark1 text-white text-xs font-medium rounded-md transition-colors whitespace-nowrap"
+                    >
+                      Sync {'\u2192'}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

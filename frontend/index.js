@@ -1,6 +1,8 @@
-import { initializeBlock } from '@airtable/blocks/interface/ui';
-import { useState } from 'react';
+import { initializeBlock, useBase, useRecords, useSession } from '@airtable/blocks/interface/ui';
+import { useMemo, useState } from 'react';
 import './style.css';
+import { TABLE_IDS, FIELD_IDS } from './constants';
+import { getStringField, getNumberField } from './helpers';
 
 import { LandingHero } from './components/LandingHero';
 import { MedalCountCard } from './components/MedalCountCard';
@@ -14,10 +16,68 @@ import { PicksChoiceModal } from './components/PicksChoiceModal';
 import { BulkPicksView } from './components/BulkPicksView';
 import { useTheme, ThemeToggle } from './components/ThemeToggle';
 
+const PLAYER_FIELDS_FOR_MATCH = [
+  FIELD_IDS.PLAYERS.NAME,
+  FIELD_IDS.PLAYERS.EMAIL,
+  FIELD_IDS.PLAYERS.DISPLAY_NAME,
+  FIELD_IDS.PLAYERS.TOTAL_SCORE,
+  FIELD_IDS.PLAYERS.REGISTRATION_STATUS,
+];
+
 function FantasyOlympicsLanding() {
   const [showPicksModal, setShowPicksModal] = useState(false);
   const [bulkPicksPlayer, setBulkPicksPlayer] = useState(null);
   const { preference, resolved, cycle } = useTheme();
+
+  // Resolve logged-in user to a player record (collaborators only)
+  const session = useSession();
+  const base = useBase();
+  const playersTable = base.getTableByIdIfExists(TABLE_IDS.PLAYERS);
+  const playerRecords = useRecords(playersTable, { fields: PLAYER_FIELDS_FOR_MATCH });
+
+  const currentPlayer = useMemo(() => {
+    if (!session.currentUser || !playerRecords) return null;
+
+    const email = session.currentUser.email?.toLowerCase();
+    const name = session.currentUser.name?.toLowerCase();
+
+    // Try email match first, then fall back to name/display name match
+    const match = playerRecords.find((r) => {
+      const pEmail = getStringField(r, FIELD_IDS.PLAYERS.EMAIL).toLowerCase();
+      return pEmail && pEmail === email;
+    }) || playerRecords.find((r) => {
+      const pName = getStringField(r, FIELD_IDS.PLAYERS.NAME).toLowerCase();
+      const pDisplay = getStringField(r, FIELD_IDS.PLAYERS.DISPLAY_NAME).toLowerCase();
+      return (pName && pName === name) || (pDisplay && pDisplay === name);
+    });
+
+    if (!match) return null;
+
+    const status = match.getCellValue(FIELD_IDS.PLAYERS.REGISTRATION_STATUS);
+    if (status?.name !== 'Approved') return null;
+
+    return {
+      id: match.id,
+      displayName: getStringField(match, FIELD_IDS.PLAYERS.DISPLAY_NAME)
+        || getStringField(match, FIELD_IDS.PLAYERS.NAME),
+      totalScore: getNumberField(match, FIELD_IDS.PLAYERS.TOTAL_SCORE),
+    };
+  }, [session.currentUser, playerRecords]);
+
+  // Compute rank among all players
+  const currentPlayerRank = useMemo(() => {
+    if (!currentPlayer || !playerRecords) return null;
+    const sorted = playerRecords
+      .map((r) => ({
+        id: r.id,
+        score: getNumberField(r, FIELD_IDS.PLAYERS.TOTAL_SCORE),
+      }))
+      .sort((a, b) => b.score - a.score);
+    const idx = sorted.findIndex((p) => p.id === currentPlayer.id);
+    return idx >= 0 ? idx + 1 : null;
+  }, [currentPlayer, playerRecords]);
+
+  const totalPlayers = playerRecords?.length || 0;
 
   // Full-screen bulk picks view replaces the landing page
   if (bulkPicksPlayer) {
@@ -36,7 +96,12 @@ function FantasyOlympicsLanding() {
     <div className={resolved === 'dark' ? 'dark' : ''}>
       <div className="min-h-screen bg-surface-page">
         {/* Hero Section */}
-        <LandingHero onMakeMyPicks={() => setShowPicksModal(true)} />
+        <LandingHero
+          onMakeMyPicks={() => setShowPicksModal(true)}
+          currentPlayer={currentPlayer}
+          currentPlayerRank={currentPlayerRank}
+          totalPlayers={totalPlayers}
+        />
 
         {/* Stats Section - Medal Count & Leaderboard */}
         <section className="py-12 px-4 sm:px-8">
@@ -97,6 +162,7 @@ function FantasyOlympicsLanding() {
 
         {showPicksModal && (
           <PicksChoiceModal
+            currentPlayer={currentPlayer}
             onClose={() => setShowPicksModal(false)}
             onBulkPicks={(player) => {
               setShowPicksModal(false);

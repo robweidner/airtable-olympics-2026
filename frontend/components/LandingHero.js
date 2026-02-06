@@ -1,9 +1,10 @@
 /**
- * LandingHero - Main hero section with headline and CTAs
+ * LandingHero - Main hero section with headline and CTAs.
+ * Shows a personalized welcome when the current user is matched to a player.
  */
 import { CountdownTimer } from './CountdownTimer';
 
-export function LandingHero({ onMakeMyPicks }) {
+export function LandingHero({ onMakeMyPicks, currentPlayer, currentPlayerRank, totalPlayers }) {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-surface-page via-surface to-blue-blueLight3 dark:from-surface-page dark:via-surface dark:to-blue-blueDark1/20 py-12 px-4 sm:py-16 sm:px-8 text-center">
       {/* Decorative background circles */}
@@ -25,10 +26,28 @@ export function LandingHero({ onMakeMyPicks }) {
           <span className="block text-blue-blue">on Airtable</span>
         </h1>
 
-        <p className="text-lg sm:text-xl text-tertiary mb-6 max-w-xl mx-auto">
-          Predict the podium. Climb the leaderboard.
-          Or build something entirely new with live Olympic data.
-        </p>
+        {currentPlayer ? (
+          <div className="mb-6 max-w-md mx-auto">
+            <div className="inline-flex items-center gap-2 bg-surface/80 backdrop-blur-sm rounded-full px-5 py-2.5 shadow-theme-md border border-light">
+              <span className="text-xl">👋</span>
+              <span className="font-semibold text-primary">
+                Welcome back, {currentPlayer.displayName}!
+              </span>
+            </div>
+            {currentPlayerRank && (
+              <p className="text-sm text-tertiary mt-3">
+                You&apos;re <span className="font-bold text-blue-blue">#{currentPlayerRank}</span>
+                {totalPlayers > 0 && <span> of {totalPlayers}</span>}
+                {' '}with <span className="font-bold text-blue-blue">{currentPlayer.totalScore} pts</span>
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="text-lg sm:text-xl text-tertiary mb-6 max-w-xl mx-auto">
+            Predict the podium. Climb the leaderboard.
+            Or build something entirely new with live Olympic data.
+          </p>
+        )}
 
         <CountdownTimer />
 
