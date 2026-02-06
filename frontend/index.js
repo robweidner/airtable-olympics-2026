@@ -9,6 +9,7 @@ import { Beijing2022Recap } from './components/Beijing2022Recap';
 import { EventsBoard } from './components/EventsBoard';
 import { BuilderSection } from './components/BuilderSection';
 import { OlympicNewsCard } from './components/OlympicNewsCard';
+import { ShareBanner } from './components/ShareBanner';
 import { PicksChoiceModal } from './components/PicksChoiceModal';
 import { BulkPicksView } from './components/BulkPicksView';
 
@@ -38,6 +39,9 @@ function FantasyOlympicsLanding() {
           <LeaderboardCard />
         </div>
       </section>
+
+      {/* Share CTA - placed after leaderboard to capitalize on competitive curiosity */}
+      <ShareBanner />
 
       {/* Olympic News Feed */}
       <section className="px-4 sm:px-8 pb-12">
