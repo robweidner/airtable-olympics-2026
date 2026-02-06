@@ -81,8 +81,8 @@ export function BulkPicksView({ player, onClose }) {
   }, [countryRecords]);
 
   // 2026 events grouped by sport
-  const { sports, eventsBySport, eventCount } = useMemo(() => {
-    if (!eventRecords || !sportRecords) return { sports: [], eventsBySport: {}, eventCount: 0 };
+  const { sports, eventsBySport, eventCount, eventStatusMap } = useMemo(() => {
+    if (!eventRecords || !sportRecords) return { sports: [], eventsBySport: {}, eventCount: 0, eventStatusMap: {} };
 
     const sportsMap = {};
     for (const r of sportRecords) {
@@ -111,6 +111,7 @@ export function BulkPicksView({ player, onClose }) {
         id: r.id,
         name: getStringField(r, FIELD_IDS.EVENTS.NAME),
         status: statusVal?.name ?? 'Upcoming',
+        date: r.getCellValue(FIELD_IDS.EVENTS.DATE) || null,
       });
       count++;
     }
@@ -126,7 +127,15 @@ export function BulkPicksView({ player, onClose }) {
       .filter(Boolean)
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    return { sports, eventsBySport, eventCount: count };
+    // Build a lookup of eventId → status for filtering during submit
+    const eventStatusMap = {};
+    for (const events of Object.values(eventsBySport)) {
+      for (const e of events) {
+        eventStatusMap[e.id] = e.status;
+      }
+    }
+
+    return { sports, eventsBySport, eventCount: count, eventStatusMap };
   }, [eventRecords, sportRecords]);
 
   // Seed picks state from existing pick records (runs once when data loads)
@@ -163,8 +172,9 @@ export function BulkPicksView({ player, onClose }) {
     setHasSeeded(true);
   }, [pickRecords, player, hasSeeded]);
 
-  // Update a single position for an event
+  // Update a single position for an event (no-op for Final events)
   const updatePick = useCallback((eventId, position, countryId) => {
+    if (eventStatusMap[eventId] === 'Final') return;
     setPicks((prev) => ({
       ...prev,
       [eventId]: {
@@ -174,18 +184,24 @@ export function BulkPicksView({ player, onClose }) {
     }));
     // Clear submission result when user makes changes
     setSubmitResult(null);
-  }, []);
+  }, [eventStatusMap]);
 
-  // Count completed events (all 3 positions filled)
-  const filledCount = useMemo(() => {
-    return Object.values(picks).filter(
-      (p) => p.gold && p.silver && p.bronze
-    ).length;
-  }, [picks]);
+  // Count completed events (all 3 positions filled) and submittable (non-Final) picks
+  const { filledCount, submittableCount } = useMemo(() => {
+    let filled = 0;
+    let submittable = 0;
+    for (const [eventId, p] of Object.entries(picks)) {
+      if (p.gold && p.silver && p.bronze) {
+        filled++;
+        if (eventStatusMap[eventId] !== 'Final') submittable++;
+      }
+    }
+    return { filledCount: filled, submittableCount: submittable };
+  }, [picks, eventStatusMap]);
 
   // Submit picks
   async function handleSubmit() {
-    if (!picksTable || filledCount === 0) return;
+    if (!picksTable || submittableCount === 0) return;
 
     // Permission check
     const perm = picksTable.checkPermissionsForCreateRecord();
@@ -203,6 +219,8 @@ export function BulkPicksView({ player, onClose }) {
 
       for (const [eventId, pick] of Object.entries(picks)) {
         if (!pick.gold || !pick.silver || !pick.bronze) continue;
+        // Never submit picks for finalized events
+        if (eventStatusMap[eventId] === 'Final') continue;
 
         const fields = {
           [FIELD_IDS.PICKS.GOLD_COUNTRY]: [{ id: pick.gold }],
@@ -269,14 +287,14 @@ export function BulkPicksView({ player, onClose }) {
 
           <button
             onClick={handleSubmit}
-            disabled={submitting || filledCount === 0}
+            disabled={submitting || submittableCount === 0}
             className={`px-5 py-2 rounded-lg font-semibold text-sm transition-all ${
-              submitting || filledCount === 0
+              submitting || submittableCount === 0
                 ? 'bg-gray-gray200 text-gray-gray400 cursor-not-allowed'
                 : 'bg-blue-blue hover:bg-blue-blueDark1 text-white shadow-sm'
             }`}
           >
-            {submitting ? 'Submitting...' : `Submit ${filledCount} Pick${filledCount !== 1 ? 's' : ''}`}
+            {submitting ? 'Submitting...' : `Submit ${submittableCount} Pick${submittableCount !== 1 ? 's' : ''}`}
           </button>
         </div>
 
@@ -345,26 +363,54 @@ function SportGroup({ sport, events, picks, countries, onUpdatePick }) {
   );
 }
 
+/** Format ISO date for display, e.g. "Feb 7 · 10:30 AM" */
+function formatEventDate(iso) {
+  if (!iso) return null;
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      + ' \u00B7 '
+      + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  } catch { return null; }
+}
+
 function EventRow({ event, pick, countries, onUpdatePick }) {
   const isFinal = event.status === 'Final';
+  const isComplete = !!(pick.gold && pick.silver && pick.bronze);
+  const isPartial = !isComplete && (pick.gold || pick.silver || pick.bronze);
+  const dateStr = formatEventDate(event.date);
+
+  // Color coding: green for complete, amber left-border for partial, default for empty
+  let cardClass = 'bg-white border-gray-gray200';
+  if (isFinal) {
+    cardClass = 'bg-gray-gray50 border-gray-gray100 opacity-60';
+  } else if (isComplete) {
+    cardClass = 'bg-green-greenLight3 border-green-greenLight1';
+  } else if (isPartial) {
+    cardClass = 'bg-white border-l-4 border-l-yellow-yellow border-gray-gray200';
+  }
 
   return (
-    <div
-      className={`bg-white rounded-lg border p-3 ${
-        isFinal
-          ? 'border-gray-gray100 opacity-60'
-          : 'border-gray-gray200'
-      }`}
-    >
+    <div className={`rounded-lg border p-3 ${cardClass}`}>
       <div className="flex items-center justify-between mb-2">
-        <p className={`font-medium text-sm ${isFinal ? 'text-gray-gray400' : 'text-gray-gray800'}`}>
-          {event.name}
-        </p>
-        {isFinal && (
-          <span className="text-xs bg-green-greenLight3 text-green-greenDark1 px-2 py-0.5 rounded-full">
-            Final
-          </span>
-        )}
+        <div className="flex items-center gap-2 min-w-0">
+          {!isFinal && isComplete && (
+            <span className="text-green-green flex-shrink-0" title="All picks locked in">&#10003;</span>
+          )}
+          <p className={`font-medium text-sm truncate ${isFinal ? 'text-gray-gray400' : 'text-gray-gray800'}`}>
+            {event.name}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+          {dateStr && (
+            <span className="text-xs text-gray-gray400">{dateStr}</span>
+          )}
+          {isFinal && (
+            <span className="text-xs bg-green-greenLight3 text-green-greenDark1 px-2 py-0.5 rounded-full">
+              Final
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Country selectors — 3-column on desktop, stacked on mobile */}
