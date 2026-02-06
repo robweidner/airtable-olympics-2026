@@ -8,6 +8,7 @@ export const TABLE_IDS = {
   PICKS: 'tblqQv8qrZXulR28g',
   SPORTS: 'tbl9zaGk0SPF4ru5I',
   OLYMPIC_NEWS: 'tblGjVfL3kPgeeChU',
+  COMMUNITY_BUILDS: 'tblOb86DI2QWNZGkH',
 };
 
 export const FIELD_IDS = {
@@ -60,6 +61,18 @@ export const FIELD_IDS = {
     STATUS: 'fldEouPyGs8pBDvbe',                // Single select: Draft/Published/Hidden
     CREATED: 'fldA98fYswKlWG9M3',               // Created time (auto)
   },
+  COMMUNITY_BUILDS: {
+    BUILD_TITLE: 'fldA6zseShXTx8E14',           // Single line text (primary field)
+    BUILDER_NAME: 'fldX3w0kERfTThXEw',
+    DESCRIPTION: 'fldIorvR6ypVBIgKp',
+    BUILD_CATEGORY: 'flddv6Jm6BNIWVTBD',        // Single select: Dashboard, Automation, etc.
+    SCREENSHOTS: 'fldRCSdK78CHjxhcC',            // Multiple attachments
+    RECORDING_LINK: 'fldSKJfuvSs4ObKMW',
+    INTERFACE_LINK: 'fldNhnWQ0BFv6kM89',
+    BASE_LINK: 'fldMRdvvJpHYjD5MB',
+    MODERATION_STATUS: 'fldtfjPLIl7JxCNYY',      // Single select: Pending Review, Approved, Featured, Rejected
+    FEATURE_ORDER: 'fldmxTYx4xGEc9ggs',
+  },
 };
 
 // Opening Ceremonies: Feb 6, 2026, 20:00 CET (UTC+1)
@@ -71,3 +84,6 @@ export const REGISTRATION_FORM_URL = 'https://airtable.com/appoY3nwpfUnUut4P/pag
 
 // Public interface URL — where players go after creating an account
 export const INTERFACE_URL = 'https://airtable.com/appoY3nwpfUnUut4P/shr5PXjBZxDFwwtEp';
+
+// Community Builds submission form — update with actual form URL after creating in Airtable UI
+export const COMMUNITY_BUILDS_FORM_URL = 'https://airtable.com/appoY3nwpfUnUut4P/pagUNnfD04Cz5Kz0H/form';
