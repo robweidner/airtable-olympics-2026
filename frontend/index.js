@@ -1,4 +1,3 @@
-import './debug-env';
 import { initializeBlock } from '@airtable/blocks/interface/ui';
 import { useState } from 'react';
 import './style.css';
@@ -90,19 +89,4 @@ function FantasyOlympicsLanding() {
   );
 }
 
-// #region agent log
-try {
-  if (typeof fetch !== 'undefined') {
-    fetch('http://127.0.0.1:7246/ingest/d61a069d-8375-40cd-9ba9-8ef8dfa5f632', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'C', location: 'frontend/index.js:initializeBlock', message: 'about to call initializeBlock', data: {}, timestamp: Date.now() }) }).catch(function () {});
-  }
-  initializeBlock({ interface: () => <FantasyOlympicsLanding /> });
-  if (typeof fetch !== 'undefined') {
-    fetch('http://127.0.0.1:7246/ingest/d61a069d-8375-40cd-9ba9-8ef8dfa5f632', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'D', location: 'frontend/index.js:initializeBlock', message: 'initializeBlock called successfully', data: {}, timestamp: Date.now() }) }).catch(function () {});
-  }
-} catch (err) {
-  if (typeof fetch !== 'undefined') {
-    fetch('http://127.0.0.1:7246/ingest/d61a069d-8375-40cd-9ba9-8ef8dfa5f632', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: 'debug-session', runId: 'run1', hypothesisId: 'E', location: 'frontend/index.js:initializeBlock', message: String(err && err.message), data: { stack: err && err.stack }, timestamp: Date.now() }) }).catch(function () {});
-  }
-  throw err;
-}
-// #endregion
+initializeBlock({ interface: () => <FantasyOlympicsLanding /> });

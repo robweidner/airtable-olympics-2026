@@ -1,3 +1,8 @@
 /node_modules
 /.airtableblocksrc.json
 /build
+.env
+.env.*
+.DS_Store
+.tmp/
+.block/.block/
