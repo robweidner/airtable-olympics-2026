@@ -77,6 +77,14 @@ The Events table contains 2022 AND 2026 data. Always filter by `FIELD_IDS.EVENTS
 
 Tailwind CSS with custom design tokens mapped to Airtable's color system (e.g., `bg-blue-blue`, `text-gray-gray500`). See `tailwind.config.js` for the full token map. No Airtable Blocks UI components (`Box`, etc.) — they are not supported in Interface Extensions.
 
+## Gotchas
+
+### Shared Interface Auth Limitations
+Non-logged-in visitors to the shared interface have **read-only access at best**. `useSession().currentUser` is `null`, and SDK write operations (`createRecordsAsync`, `updateRecordsAsync`) will fail. Airtable Forms are the write path for unauthenticated users. The `PicksChoiceModal` handles this by showing an account creation prompt when `currentUser` is null, with the form as a fallback.
+
+### macOS Local Network Prompt
+Safari users on macOS may see "Allow airtable.com to access your local network?" when visiting the shared interface. This is a macOS privacy prompt triggered by Airtable's embedded scripts — safe to deny, does not affect functionality.
+
 ## No Testing Framework
 
 No test runner is configured. Quality checks are ESLint only.
