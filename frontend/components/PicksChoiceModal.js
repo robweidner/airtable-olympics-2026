@@ -121,12 +121,14 @@ export function PicksChoiceModal({ currentPlayer, onClose, onBulkPicks }) {
               <div className="space-y-3">
                 <a
                   href={SIGN_UP_URL}
+                  target="_top"
                   className="block w-full text-center px-4 py-3 bg-blue-blue hover:bg-blue-blueDark1 text-white font-semibold rounded-lg transition-colors"
                 >
                   Sign Up — it&apos;s free
                 </a>
                 <a
                   href={SIGN_IN_URL}
+                  target="_top"
                   className="block w-full text-center px-4 py-3 bg-surface hover:bg-surface-raised text-secondary font-medium rounded-lg border border-default transition-colors"
                 >
                   I already have an account
