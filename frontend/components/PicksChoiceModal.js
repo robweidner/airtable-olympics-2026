@@ -38,9 +38,10 @@ export function PicksChoiceModal({ onClose }) {
             Open Picks Form
           </button>
           <p className="text-xs text-center text-muted">
-            Select your picks, explore the data we&apos;ve provided, and stay
-            tuned &mdash; we&apos;re working on a way to make all your picks at
-            once.
+            You may be asked to sign in to Airtable &mdash; it&apos;s
+            completely free. Select your picks, explore the data we&apos;ve
+            provided, and stay tuned &mdash; we&apos;re working on a way to
+            make all your picks at once.
           </p>
         </div>
       </div>
