@@ -44,7 +44,8 @@ export function MedalCountCard() {
   if (!countriesTable) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-gray700 mb-4">Medal Count</h2>
+        <h2 className="text-xl font-semibold text-gray-gray700">Medal Count</h2>
+        <p className="text-sm text-gray-gray400 mb-4">Milano-Cortina 2026</p>
         <p className="text-gray-gray400 text-sm">
           Countries table not found. Make sure your base has a &quot;Countries&quot; table.
         </p>
@@ -52,21 +53,31 @@ export function MedalCountCard() {
     );
   }
 
-  // Handle empty state
+  // Handle empty state - show zeros with friendly message
   if (topCountries.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-gray700 mb-4">Medal Count</h2>
-        <p className="text-gray-gray400 text-sm">
-          No medals awarded yet. Check back once events begin!
-        </p>
+        <h2 className="text-xl font-semibold text-gray-gray700">Medal Count</h2>
+        <p className="text-sm text-gray-gray400 mb-4">Milano-Cortina 2026</p>
+
+        <div className="text-center py-6">
+          <div className="flex justify-center gap-8 mb-4">
+            <MedalPlaceholder emoji="🥇" label="Gold" />
+            <MedalPlaceholder emoji="🥈" label="Silver" />
+            <MedalPlaceholder emoji="🥉" label="Bronze" />
+          </div>
+          <p className="text-gray-gray500 text-sm">
+            Tracking starts when the games begin!
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold text-gray-gray700 mb-4">Medal Count</h2>
+      <h2 className="text-xl font-semibold text-gray-gray700">Medal Count</h2>
+      <p className="text-sm text-gray-gray400 mb-4">Milano-Cortina 2026</p>
 
       <div className="space-y-3">
         {topCountries.map((country, index) => (
@@ -109,5 +120,15 @@ function MedalBadge({ emoji, count, label }) {
       <span>{emoji}</span>
       <span className="text-gray-gray600 min-w-[1.5rem] text-center">{count}</span>
     </span>
+  );
+}
+
+function MedalPlaceholder({ emoji, label }) {
+  return (
+    <div className="text-center">
+      <span className="text-3xl">{emoji}</span>
+      <div className="text-2xl font-bold text-gray-gray300 tabular-nums">0</div>
+      <div className="text-xs text-gray-gray400 uppercase">{label}</div>
+    </div>
   );
 }

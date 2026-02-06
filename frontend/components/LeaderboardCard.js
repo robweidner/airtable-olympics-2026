@@ -33,7 +33,8 @@ export function LeaderboardCard() {
   if (!playersTable) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-gray700 mb-4">Leaderboard</h2>
+        <h2 className="text-xl font-semibold text-gray-gray700">Leaderboard</h2>
+        <p className="text-sm text-gray-gray400 mb-4">See how your picks stack up</p>
         <p className="text-gray-gray400 text-sm">
           Players table not found. Make sure your base has a &quot;Players&quot; table.
         </p>
@@ -45,7 +46,8 @@ export function LeaderboardCard() {
   if (topPlayers.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-gray700 mb-4">Leaderboard</h2>
+        <h2 className="text-xl font-semibold text-gray-gray700">Leaderboard</h2>
+        <p className="text-sm text-gray-gray400 mb-4">See how your picks stack up</p>
         <p className="text-gray-gray400 text-sm">
           No players yet. Be the first to join!
         </p>
@@ -55,7 +57,8 @@ export function LeaderboardCard() {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold text-gray-gray700 mb-4">Leaderboard</h2>
+      <h2 className="text-xl font-semibold text-gray-gray700">Leaderboard</h2>
+      <p className="text-sm text-gray-gray400 mb-4">See how your picks stack up</p>
 
       <div className="space-y-2">
         {topPlayers.map((player, index) => (
