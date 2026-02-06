@@ -1,17 +1,17 @@
 /**
  * PicksChoiceModal - "Make My Picks" entry point.
  *
- * When currentPlayer is provided (resolved at the root from session), skips
- * straight to pick method selection.
+ * Three flows:
+ * 1. Collaborator (currentPlayer from session) → skip to pick methods
+ * 2. Returning player (email + PIN match) → "Update Your Picks" + picks form
+ * 3. New player (email not found) → "Create New Picks" + registration form
  *
- * When no currentPlayer exists (non-collaborators on shared interfaces),
- * asks for email + 4-character PIN to identify the player. The PIN is the
- * last 4 characters of the player's Airtable record ID — lightweight
- * verification for a game, not a bank.
+ * Uses Airtable Forms for registration since non-collaborators can't
+ * write via the SDK.
  */
 import { useSession } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
-import { FIELD_IDS, PICKS_FORM_URL } from '../constants';
+import { FIELD_IDS, PICKS_FORM_URL, REGISTRATION_FORM_URL } from '../constants';
 import { getStringField, getNumberField } from '../helpers';
 
 export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulkPicks }) {
@@ -22,35 +22,54 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
   const [pinInput, setPinInput] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  // Match email + PIN against player records
-  const emailPinMatch = useMemo(() => {
+  // Three-state match: { status: 'match', player } | { status: 'wrong_pin' } | { status: 'new_user' } | null
+  const matchResult = useMemo(() => {
     if (!submitted || !playerRecords) return null;
     const email = emailInput.toLowerCase().trim();
     const pin = pinInput.trim();
     if (!email || !pin) return null;
 
+    let emailExists = false;
+
     for (const r of playerRecords) {
-      const status = r.getCellValue(FIELD_IDS.PLAYERS.REGISTRATION_STATUS);
-      if (status?.name !== 'Approved') continue;
       const pEmail = getStringField(r, FIELD_IDS.PLAYERS.EMAIL).toLowerCase().trim();
+      if (pEmail !== email) continue;
+
+      emailExists = true;
       const pPin = String(getNumberField(r, FIELD_IDS.PLAYERS.PIN));
-      if (pEmail === email && pPin === pin) {
+      if (pPin === pin) {
         return {
-          id: r.id,
-          displayName: getStringField(r, FIELD_IDS.PLAYERS.DISPLAY_NAME)
-            || getStringField(r, FIELD_IDS.PLAYERS.NAME),
+          status: 'match',
+          player: {
+            id: r.id,
+            displayName: getStringField(r, FIELD_IDS.PLAYERS.DISPLAY_NAME)
+              || getStringField(r, FIELD_IDS.PLAYERS.NAME),
+          },
         };
       }
     }
-    return null;
+
+    return emailExists ? { status: 'wrong_pin' } : { status: 'new_user' };
   }, [submitted, emailInput, pinInput, playerRecords]);
 
   // Resolved player: collaborator match takes priority, then email+PIN match
-  const resolvedPlayer = currentPlayer || emailPinMatch;
+  const resolvedPlayer = currentPlayer
+    || (matchResult?.status === 'match' ? matchResult.player : null);
+
+  // Dynamic title
+  const title = resolvedPlayer
+    ? 'Update Your Picks'
+    : (matchResult?.status === 'new_user' ? 'Create New Picks' : 'Make My Picks');
 
   function handleSubmit(e) {
     e.preventDefault();
     setSubmitted(true);
+  }
+
+  function resetForm() {
+    setSubmitted(false);
+    setEmailInput('');
+    setPinInput('');
   }
 
   function handleOneByOne() {
@@ -65,6 +84,11 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
     onBulkPicks({ id: resolvedPlayer.id, name: resolvedPlayer.displayName });
   }
 
+  function handleRegister() {
+    const url = `${REGISTRATION_FORM_URL}?prefill_Email=${encodeURIComponent(emailInput.trim())}&prefill_PIN=${encodeURIComponent(pinInput.trim())}`;
+    window.open(url, '_blank');
+  }
+
   return (
     <div
       className="fixed inset-0 bg-backdrop flex items-center justify-center z-50"
@@ -76,7 +100,7 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-light">
-          <h2 className="text-xl font-semibold text-primary">Make My Picks</h2>
+          <h2 className="text-xl font-semibold text-primary">{title}</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-raised text-tertiary transition-colors text-lg"
@@ -93,14 +117,16 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
                 <span className="text-lg">👋</span>
                 <div>
                   <p className="font-medium text-primary">
-                    Hey, {resolvedPlayer.displayName}!
+                    {currentPlayer
+                      ? `Hey, ${resolvedPlayer.displayName}!`
+                      : `Welcome back, ${resolvedPlayer.displayName}!`}
                   </p>
                   <p className="text-xs text-tertiary">
                     {currentPlayer ? 'Matched by your Airtable account' : (
                       <>
                         Matched by email &middot;{' '}
                         <button
-                          onClick={() => { setSubmitted(false); setEmailInput(''); setPinInput(''); }}
+                          onClick={resetForm}
                           className="text-blue-blue hover:text-blue-blueDark1"
                         >
                           Not you?
@@ -148,17 +174,53 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
                 )}
               </div>
             </>
+          ) : matchResult?.status === 'new_user' ? (
+            <>
+              {/* New user — registration prompt */}
+              <div className="text-center py-1">
+                <span className="text-3xl">🏅</span>
+                <h3 className="text-lg font-semibold text-primary mt-2">
+                  Looks like you&apos;re new!
+                </h3>
+                <p className="text-sm text-tertiary mt-1.5 max-w-xs mx-auto">
+                  Register below to start picking. You&apos;ll choose a display name
+                  and your email + PIN will be saved so you can come back anytime.
+                </p>
+              </div>
+
+              <button
+                onClick={handleRegister}
+                className="w-full py-2.5 px-4 bg-green-green hover:bg-green-greenDark1 text-white font-medium text-sm rounded-lg transition-colors"
+              >
+                Register &amp; Start Picking
+              </button>
+
+              <div className="bg-surface-raised rounded-lg p-3">
+                <p className="text-xs text-tertiary leading-relaxed">
+                  After you submit the registration form, come back here and
+                  click &ldquo;Make My Picks&rdquo; again. Your email and PIN
+                  will work right away.
+                </p>
+              </div>
+
+              <button
+                onClick={resetForm}
+                className="w-full text-sm text-blue-blue hover:text-blue-blueDark1 transition-colors"
+              >
+                &larr; Back
+              </button>
+            </>
           ) : (
             <>
               {/* Email + PIN identification */}
               <div className="text-center py-1">
                 <span className="text-3xl">🏅</span>
                 <h3 className="text-lg font-semibold text-primary mt-2">
-                  Verify your identity
+                  Enter your details
                 </h3>
                 <p className="text-sm text-tertiary mt-1.5 max-w-xs mx-auto">
-                  Enter your email and numeric PIN to access your picks.
-                  It&apos;s a game, not a bank &mdash; the PIN just keeps things fair.
+                  New here? Pick any numeric PIN you&apos;ll remember.
+                  Returning? Use the same email and PIN you registered with.
                 </p>
               </div>
 
@@ -186,7 +248,7 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
                     pattern="[0-9]*"
                     value={pinInput}
                     onChange={(e) => { setPinInput(e.target.value.replace(/\D/g, '')); setSubmitted(false); }}
-                    placeholder="Numeric PIN"
+                    placeholder="Choose or enter your numeric PIN"
                     className="w-full border border-default rounded-lg px-3 py-2 bg-surface text-primary focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none text-sm font-mono tracking-widest"
                   />
                 </div>
@@ -201,15 +263,15 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
                 >
                   Let&apos;s Go
                 </button>
-                {submitted && !emailPinMatch && (
+                {matchResult?.status === 'wrong_pin' && (
                   <p className="text-xs text-red-red text-center">
-                    No match found. Check your email and PIN, or ask the game organizer for help.
+                    Incorrect PIN. Try again or ask the game organizer for help.
                   </p>
                 )}
               </form>
 
               <p className="text-xs text-center text-muted">
-                Don&apos;t have a PIN? Ask the person who invited you to the game.
+                It&apos;s a game, not a bank &mdash; the PIN just keeps things fair.
               </p>
             </>
           )}

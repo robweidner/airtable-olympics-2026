@@ -67,6 +67,7 @@ export const OPENING_CEREMONY_DATE = new Date('2026-02-06T19:00:00Z');
 
 // Public form URLs
 export const PICKS_FORM_URL = 'https://airtable.com/appoY3nwpfUnUut4P/pagzkW6PMYY37XHaB/form';
+export const REGISTRATION_FORM_URL = 'https://airtable.com/appoY3nwpfUnUut4P/pagbIhIqMeRKTK218/form';
 
 // Public interface URL — where players go after creating an account
 export const INTERFACE_URL = 'https://airtable.com/appoY3nwpfUnUut4P/shr5PXjBZxDFwwtEp';
