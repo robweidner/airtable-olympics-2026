@@ -42,12 +42,21 @@ export function useTheme() {
   const [preference, setPreference] = useState(getStoredPreference);
   const [systemTheme, setSystemTheme] = useState(getSystemTheme);
 
-  // Listen for OS theme changes
+  // Listen for OS theme changes — uses both event listener and polling
+  // because Airtable's iframe sandbox may not propagate matchMedia change events
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = (e) => setSystemTheme(e.matches ? 'dark' : 'light');
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    const update = () => setSystemTheme(mq.matches ? 'dark' : 'light');
+
+    mq.addEventListener('change', update);
+
+    // Poll every 2s as fallback for sandboxed iframes
+    const poll = setInterval(update, 2000);
+
+    return () => {
+      mq.removeEventListener('change', update);
+      clearInterval(poll);
+    };
   }, []);
 
   // Persist preference
