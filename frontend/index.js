@@ -13,7 +13,6 @@ import { BuilderSection } from './components/BuilderSection';
 import { OlympicNewsCard } from './components/OlympicNewsCard';
 import { ShareBanner } from './components/ShareBanner';
 import { PicksChoiceModal } from './components/PicksChoiceModal';
-import { BulkPicksView } from './components/BulkPicksView';
 import { useTheme, ThemeToggle } from './components/ThemeToggle';
 
 const PLAYER_FIELDS_FOR_MATCH = [
@@ -27,7 +26,6 @@ const PLAYER_FIELDS_FOR_MATCH = [
 
 function FantasyOlympicsLanding() {
   const [showPicksModal, setShowPicksModal] = useState(false);
-  const [bulkPicksPlayer, setBulkPicksPlayer] = useState(null);
   const { preference, resolved, cycle } = useTheme();
 
   // Resolve logged-in user to a player record (collaborators only)
@@ -79,19 +77,6 @@ function FantasyOlympicsLanding() {
   }, [currentPlayer, playerRecords]);
 
   const totalPlayers = playerRecords?.length || 0;
-
-  // Full-screen bulk picks view replaces the landing page
-  if (bulkPicksPlayer) {
-    return (
-      <div className={resolved === 'dark' ? 'dark' : ''}>
-        <BulkPicksView
-          player={bulkPicksPlayer}
-          onClose={() => setBulkPicksPlayer(null)}
-        />
-        <ThemeToggle preference={preference} onCycle={cycle} />
-      </div>
-    );
-  }
 
   return (
     <div className={resolved === 'dark' ? 'dark' : ''}>
@@ -166,10 +151,6 @@ function FantasyOlympicsLanding() {
             currentPlayer={currentPlayer}
             playerRecords={playerRecords}
             onClose={() => setShowPicksModal(false)}
-            onBulkPicks={(player) => {
-              setShowPicksModal(false);
-              setBulkPicksPlayer(player);
-            }}
           />
         )}
       </div>

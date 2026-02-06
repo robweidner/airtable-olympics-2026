@@ -9,15 +9,11 @@
  * Uses Airtable Forms for registration since non-collaborators can't
  * write via the SDK.
  */
-import { useSession } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { FIELD_IDS, PICKS_FORM_URL, REGISTRATION_FORM_URL } from '../constants';
 import { getStringField, getNumberField } from '../helpers';
 
-export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulkPicks }) {
-  const session = useSession();
-  const isCollaborator = !!session.currentUser;
-
+export function PicksChoiceModal({ currentPlayer, playerRecords, onClose }) {
   const [emailInput, setEmailInput] = useState('');
   const [pinInput, setPinInput] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -79,11 +75,6 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
     onClose();
   }
 
-  function handleBulk() {
-    if (!resolvedPlayer) return;
-    onBulkPicks({ id: resolvedPlayer.id, name: resolvedPlayer.displayName });
-  }
-
   function handleRegister() {
     const url = `${REGISTRATION_FORM_URL}?prefill_Email=${encodeURIComponent(emailInput.trim())}&prefill_PIN=${encodeURIComponent(pinInput.trim())}`;
     window.open(url, '_blank');
@@ -137,41 +128,17 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
                 </div>
               </div>
 
-              {/* Pick method cards */}
+              {/* Pick CTA */}
               <div className="space-y-3">
-                <p className="text-sm font-medium text-secondary">How do you want to pick?</p>
-
                 <button
                   onClick={handleOneByOne}
-                  className="w-full text-left p-4 rounded-lg border-2 border-default hover:border-blue-blue hover:bg-blue-blueLight3 dark:hover:bg-blue-blueDark1/20 cursor-pointer transition-all"
+                  className="w-full py-2.5 px-4 bg-blue-blue hover:bg-blue-blueDark1 text-white font-medium text-sm rounded-lg transition-colors"
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">📝</span>
-                    <div>
-                      <p className="font-semibold text-primary">One at a time</p>
-                      <p className="text-sm text-tertiary mt-0.5">
-                        Fill out the form for each event. Best if you want to pick events as they happen.
-                      </p>
-                    </div>
-                  </div>
+                  Open Picks Form
                 </button>
-
-                {isCollaborator && (
-                  <button
-                    onClick={handleBulk}
-                    className="w-full text-left p-4 rounded-lg border-2 border-default hover:border-blue-blue hover:bg-blue-blueLight3 dark:hover:bg-blue-blueDark1/20 cursor-pointer transition-all"
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="text-2xl">🗂️</span>
-                      <div>
-                        <p className="font-semibold text-primary">All at once</p>
-                        <p className="text-sm text-tertiary mt-0.5">
-                          Fill in your entire bracket on one screen. Best if you want to do it all in one sitting.
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                )}
+                <p className="text-xs text-center text-muted">
+                  Select your picks, explore the data we&apos;ve provided, and stay tuned for what&apos;s to come.
+                </p>
               </div>
             </>
           ) : matchResult?.status === 'new_user' ? (

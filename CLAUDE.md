@@ -23,11 +23,11 @@ There is no `npm start`, `npm run dev`, or `npm run build`. The app runs inside 
 
 **Component structure:**
 - `frontend/index.js` — Root `FantasyOlympicsLanding`, manages modal/view state
-- `frontend/components/` — 13 React components (PascalCase filenames)
+- `frontend/components/` — 11 React components (PascalCase filenames)
 - `frontend/constants.js` — All table/field IDs, opening ceremony date, form URLs
 - `frontend/helpers.js` — Record-to-object mappers, medal count computation
 
-**Two view modes:** Landing page (default) and BulkPicksView (full-screen replacement, not a route).
+**Single view mode:** Landing page with modal-based picks flow.
 
 ## Critical Patterns
 
@@ -57,7 +57,7 @@ const records = useRecords(table, { fields: [...fieldIds] });
 Always use `getTableByIdIfExists` / `getFieldIfExists` (returns null) over `getTableById` / `getField` (throws).
 
 ### Batch Write Limits
-Max 50 records per `createRecordsAsync`/`updateRecordsAsync` call. Rate limited to 15 calls/second. `BulkPicksView` handles this with chunking.
+Max 50 records per `createRecordsAsync`/`updateRecordsAsync` call. Rate limited to 15 calls/second.
 
 ### Events Table Has Both Years
 The Events table contains 2022 AND 2026 data. Always filter by `FIELD_IDS.EVENTS.YEAR` when showing current Olympics data.
