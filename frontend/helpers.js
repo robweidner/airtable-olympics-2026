@@ -118,6 +118,10 @@ export function mapRecordToPlayer(record) {
 export function mapRecordToEvent(record) {
   const sportLink = record.getCellValue(FIELD_IDS.EVENTS.SPORT);
   const statusValue = record.getCellValue(FIELD_IDS.EVENTS.STATUS);
+  const goldLink = record.getCellValue(FIELD_IDS.EVENTS.GOLD_COUNTRY);
+  const silverLink = record.getCellValue(FIELD_IDS.EVENTS.SILVER_COUNTRY);
+  const bronzeLink = record.getCellValue(FIELD_IDS.EVENTS.BRONZE_COUNTRY);
+
   return {
     id: record.id,
     name: getStringField(record, FIELD_IDS.EVENTS.NAME),
@@ -126,6 +130,9 @@ export function mapRecordToEvent(record) {
     status: statusValue?.name ?? 'Upcoming',
     venue: getStringField(record, FIELD_IDS.EVENTS.VENUE),
     year: getNumberField(record, FIELD_IDS.EVENTS.YEAR),
+    goldCountry: goldLink?.[0]?.name ?? null,
+    silverCountry: silverLink?.[0]?.name ?? null,
+    bronzeCountry: bronzeLink?.[0]?.name ?? null,
   };
 }
 

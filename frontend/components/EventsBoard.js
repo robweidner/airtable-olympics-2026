@@ -20,6 +20,9 @@ const EVENT_FIELDS = [
   FIELD_IDS.EVENTS.SPORT,
   FIELD_IDS.EVENTS.STATUS,
   FIELD_IDS.EVENTS.YEAR,
+  FIELD_IDS.EVENTS.GOLD_COUNTRY,
+  FIELD_IDS.EVENTS.SILVER_COUNTRY,
+  FIELD_IDS.EVENTS.BRONZE_COUNTRY,
 ];
 
 export function EventsBoard({ onMakeMyPicks }) {
@@ -155,9 +158,18 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
       {/* Event list */}
       <ul className={`space-y-1 text-sm ${isExpanded ? 'columns-1 sm:columns-2 lg:columns-3 gap-x-6' : ''}`}>
         {displayEvents.map(event => (
-          <li key={event.id} className="flex items-center gap-2 text-gray-gray600 break-inside-avoid">
-            <StatusDot status={event.status} />
-            <span className={isExpanded ? '' : 'truncate'}>{event.name}</span>
+          <li key={event.id} className="break-inside-avoid">
+            <div className="flex items-center gap-2 text-gray-gray600">
+              <StatusDot status={event.status} />
+              <span className={isExpanded ? '' : 'truncate'}>{event.name}</span>
+            </div>
+            {isExpanded && event.goldCountry && (
+              <div className="ml-4 mt-0.5 mb-1 text-xs text-gray-gray500 flex flex-wrap gap-x-3">
+                <span>🥇 {event.goldCountry}</span>
+                {event.silverCountry && <span>🥈 {event.silverCountry}</span>}
+                {event.bronzeCountry && <span>🥉 {event.bronzeCountry}</span>}
+              </div>
+            )}
           </li>
         ))}
       </ul>
