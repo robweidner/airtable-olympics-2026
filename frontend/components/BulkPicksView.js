@@ -116,9 +116,14 @@ export function BulkPicksView({ player, onClose }) {
       count++;
     }
 
-    // Sort events alphabetically within each sport
+    // Sort events by date within each sport (undated events go last, then alphabetical)
     for (const events of Object.values(eventsBySport)) {
-      events.sort((a, b) => a.name.localeCompare(b.name));
+      events.sort((a, b) => {
+        if (a.date && b.date) return new Date(a.date) - new Date(b.date);
+        if (a.date && !b.date) return -1;
+        if (!a.date && b.date) return 1;
+        return a.name.localeCompare(b.name);
+      });
     }
 
     // Sports sorted by name, only include those with 2026 events
