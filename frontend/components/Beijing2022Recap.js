@@ -1,57 +1,64 @@
 /**
  * Beijing2022Recap - Collapsible section showing 2022 Winter Olympics results
- * Displays stats summary and top 10 medal countries when expanded
+ * Computes medals from Events table Gold/Silver/Bronze Country link fields (Year=2022)
  */
 import { useState, useMemo } from 'react';
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
-import { mapRecordToCountry } from '../helpers';
+import { mapRecordToCountry, computeMedalCounts } from '../helpers';
 
-const MEDAL_FIELDS = [
+// Fields needed from Events to compute 2022 medals
+const EVENT_MEDAL_FIELDS = [
+  FIELD_IDS.EVENTS.YEAR,
+  FIELD_IDS.EVENTS.GOLD_COUNTRY,
+  FIELD_IDS.EVENTS.SILVER_COUNTRY,
+  FIELD_IDS.EVENTS.BRONZE_COUNTRY,
+];
+
+const COUNTRY_NAME_FIELDS = [
   FIELD_IDS.COUNTRIES.NAME,
   FIELD_IDS.COUNTRIES.NOC,
-  FIELD_IDS.COUNTRIES.GOLD_MEDALS,
-  FIELD_IDS.COUNTRIES.SILVER_MEDALS,
-  FIELD_IDS.COUNTRIES.BRONZE_MEDALS,
-  FIELD_IDS.COUNTRIES.TOTAL_MEDALS,
 ];
 
 export function Beijing2022Recap() {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const base = useBase();
+  const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
   const countriesTable = base.getTableByIdIfExists(TABLE_IDS.COUNTRIES);
-  const records = useRecords(countriesTable, { fields: MEDAL_FIELDS });
 
-  // Get top 10 countries by medal count
+  const eventRecords = useRecords(eventsTable, { fields: EVENT_MEDAL_FIELDS });
+  const countryRecords = useRecords(countriesTable, { fields: COUNTRY_NAME_FIELDS });
+
+  // Build country lookup map
+  const countryMap = useMemo(() => {
+    const map = new Map();
+    if (!countryRecords) return map;
+    for (const rec of countryRecords) {
+      map.set(rec.id, mapRecordToCountry(rec));
+    }
+    return map;
+  }, [countryRecords]);
+
+  // Compute 2022 medal counts from Events
   const topCountries = useMemo(() => {
-    if (!records) return [];
-    return records
-      .map(mapRecordToCountry)
-      .filter((c) => c.total > 0)
-      .sort((a, b) => {
-        if (b.gold !== a.gold) return b.gold - a.gold;
-        if (b.silver !== a.silver) return b.silver - a.silver;
-        return b.total - a.total;
-      })
-      .slice(0, 10);
-  }, [records]);
+    if (!eventRecords) return [];
+    return computeMedalCounts(eventRecords, countryMap, 2022).slice(0, 10);
+  }, [eventRecords, countryMap]);
 
   // Calculate summary stats
   const stats = useMemo(() => {
-    if (!records) return { totalMedals: 0, countries: 0, topCountry: null };
-    const withMedals = records.map(mapRecordToCountry).filter(c => c.total > 0);
-    const totalMedals = withMedals.reduce((sum, c) => sum + c.total, 0);
-    const sorted = [...withMedals].sort((a, b) => b.gold - a.gold);
+    if (!eventRecords) return { totalMedals: 0, countries: 0, topCountry: null };
+    const allCountries = computeMedalCounts(eventRecords, countryMap, 2022);
+    const totalMedals = allCountries.reduce((sum, c) => sum + c.total, 0);
     return {
       totalMedals,
-      countries: withMedals.length,
-      topCountry: sorted[0] || null,
+      countries: allCountries.length,
+      topCountry: allCountries[0] || null,
     };
-  }, [records]);
+  }, [eventRecords, countryMap]);
 
-  // Don't render if table not available
-  if (!countriesTable) {
+  if (!eventsTable || !countriesTable) {
     return null;
   }
 
@@ -106,35 +113,41 @@ export function Beijing2022Recap() {
             </div>
 
             {/* Medal Table */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-gray100 overflow-x-auto">
-              <table className="w-full text-sm min-w-[400px]">
-                <thead className="bg-gray-gray50 text-gray-gray600">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-medium w-12">#</th>
-                    <th className="px-4 py-3 text-left font-medium">Country</th>
-                    <th className="px-4 py-3 text-center font-medium w-16">🥇</th>
-                    <th className="px-4 py-3 text-center font-medium w-16">🥈</th>
-                    <th className="px-4 py-3 text-center font-medium w-16">🥉</th>
-                    <th className="px-4 py-3 text-center font-medium w-20">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topCountries.map((country, idx) => (
-                    <tr key={country.id} className="border-t border-gray-gray100 hover:bg-gray-gray50">
-                      <td className="px-4 py-3 text-gray-gray400 font-medium">{idx + 1}</td>
-                      <td className="px-4 py-3 font-medium text-gray-gray800">
-                        {country.name}
-                        <span className="ml-2 text-xs text-gray-gray400">{country.noc}</span>
-                      </td>
-                      <td className="px-4 py-3 text-center tabular-nums">{country.gold}</td>
-                      <td className="px-4 py-3 text-center tabular-nums">{country.silver}</td>
-                      <td className="px-4 py-3 text-center tabular-nums">{country.bronze}</td>
-                      <td className="px-4 py-3 text-center font-semibold tabular-nums">{country.total}</td>
+            {topCountries.length > 0 ? (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-gray100 overflow-x-auto">
+                <table className="w-full text-sm min-w-[400px]">
+                  <thead className="bg-gray-gray50 text-gray-gray600">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-medium w-12">#</th>
+                      <th className="px-4 py-3 text-left font-medium">Country</th>
+                      <th className="px-4 py-3 text-center font-medium w-16">{'\uD83E\uDD47'}</th>
+                      <th className="px-4 py-3 text-center font-medium w-16">{'\uD83E\uDD48'}</th>
+                      <th className="px-4 py-3 text-center font-medium w-16">{'\uD83E\uDD49'}</th>
+                      <th className="px-4 py-3 text-center font-medium w-20">Total</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {topCountries.map((country, idx) => (
+                      <tr key={country.id} className="border-t border-gray-gray100 hover:bg-gray-gray50">
+                        <td className="px-4 py-3 text-gray-gray400 font-medium">{idx + 1}</td>
+                        <td className="px-4 py-3 font-medium text-gray-gray800">
+                          {country.name}
+                          <span className="ml-2 text-xs text-gray-gray400">{country.noc}</span>
+                        </td>
+                        <td className="px-4 py-3 text-center tabular-nums">{country.gold}</td>
+                        <td className="px-4 py-3 text-center tabular-nums">{country.silver}</td>
+                        <td className="px-4 py-3 text-center tabular-nums">{country.bronze}</td>
+                        <td className="px-4 py-3 text-center font-semibold tabular-nums">{country.total}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-center text-gray-gray400 text-sm py-4">
+                No 2022 medal data available yet. Gold/Silver/Bronze Country fields on Events need to be populated for 2022 events.
+              </p>
+            )}
           </div>
         )}
       </div>

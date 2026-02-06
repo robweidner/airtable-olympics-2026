@@ -3,7 +3,7 @@
  */
 import { CountdownTimer } from './CountdownTimer';
 
-export function LandingHero() {
+export function LandingHero({ onMakeMyPicks }) {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-gray-gray50 via-white to-blue-blueLight3 py-12 px-4 sm:py-16 sm:px-8 text-center">
       {/* Decorative background circles */}
@@ -35,10 +35,7 @@ export function LandingHero() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             className="px-8 py-3 bg-blue-blue hover:bg-blue-blueDark1 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
-            onClick={() => {
-              // Navigate to Events interface - will be configured when connected to base
-              console.log('Navigate to Make My Picks');
-            }}
+            onClick={onMakeMyPicks}
           >
             Make My Picks
           </button>

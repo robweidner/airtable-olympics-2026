@@ -1,11 +1,13 @@
 /**
  * LeaderboardCard - Displays top 10 fantasy players by score
+ * Click any player to see all their picks in a pop-up modal.
  * Uses field-limited queries and useMemo for performance
  */
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToPlayer } from '../helpers';
+import { PlayerPicksModal } from './PlayerPicksModal';
 
 const PLAYER_FIELDS = [
   FIELD_IDS.PLAYERS.NAME,
@@ -15,6 +17,7 @@ const PLAYER_FIELDS = [
 export function LeaderboardCard() {
   const base = useBase();
   const playersTable = base.getTableByIdIfExists(TABLE_IDS.PLAYERS);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   // Fetch only the fields we need
   const records = useRecords(playersTable, { fields: PLAYER_FIELDS });
@@ -64,14 +67,15 @@ export function LeaderboardCard() {
         {topPlayers.map((player, index) => (
           <div
             key={player.id}
-            className={`flex items-center justify-between py-3 px-3 rounded-md ${
+            onClick={() => setSelectedPlayer(player)}
+            className={`flex items-center justify-between py-3 px-3 rounded-md cursor-pointer transition-colors ${
               index === 0
-                ? 'bg-yellow-yellowLight3 border border-yellow-yellowLight1'
+                ? 'bg-yellow-yellowLight3 border border-yellow-yellowLight1 hover:bg-yellow-yellowLight2'
                 : index === 1
-                  ? 'bg-gray-gray50 border border-gray-gray200'
+                  ? 'bg-gray-gray50 border border-gray-gray200 hover:bg-gray-gray100'
                   : index === 2
-                    ? 'bg-orange-orangeLight3 border border-orange-orangeLight2'
-                    : 'border-b border-gray-gray100'
+                    ? 'bg-orange-orangeLight3 border border-orange-orangeLight2 hover:bg-orange-orangeLight2'
+                    : 'border-b border-gray-gray100 hover:bg-gray-gray50'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -88,6 +92,13 @@ export function LeaderboardCard() {
           </div>
         ))}
       </div>
+
+      {selectedPlayer && (
+        <PlayerPicksModal
+          player={selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
+        />
+      )}
     </div>
   );
 }

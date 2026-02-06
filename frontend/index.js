@@ -1,5 +1,6 @@
 import './debug-env';
 import { initializeBlock } from '@airtable/blocks/interface/ui';
+import { useState } from 'react';
 import './style.css';
 
 import { LandingHero } from './components/LandingHero';
@@ -8,18 +9,41 @@ import { LeaderboardCard } from './components/LeaderboardCard';
 import { Beijing2022Recap } from './components/Beijing2022Recap';
 import { EventsBoard } from './components/EventsBoard';
 import { BuilderSection } from './components/BuilderSection';
+import { OlympicNewsCard } from './components/OlympicNewsCard';
+import { PicksChoiceModal } from './components/PicksChoiceModal';
+import { BulkPicksView } from './components/BulkPicksView';
 
 function FantasyOlympicsLanding() {
+  const [showPicksModal, setShowPicksModal] = useState(false);
+  const [bulkPicksPlayer, setBulkPicksPlayer] = useState(null);
+
+  // Full-screen bulk picks view replaces the landing page
+  if (bulkPicksPlayer) {
+    return (
+      <BulkPicksView
+        player={bulkPicksPlayer}
+        onClose={() => setBulkPicksPlayer(null)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-gray50">
       {/* Hero Section */}
-      <LandingHero />
+      <LandingHero onMakeMyPicks={() => setShowPicksModal(true)} />
 
       {/* Stats Section - Medal Count & Leaderboard */}
       <section className="py-12 px-4 sm:px-8">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
           <MedalCountCard />
           <LeaderboardCard />
+        </div>
+      </section>
+
+      {/* Olympic News Feed */}
+      <section className="px-4 sm:px-8 pb-12">
+        <div className="max-w-5xl mx-auto">
+          <OlympicNewsCard />
         </div>
       </section>
 
@@ -38,9 +62,30 @@ function FantasyOlympicsLanding() {
           Built with Airtable Interface Extensions SDK
         </p>
         <p className="mt-1">
-          Winter Olympics 2026 · Milano Cortina
+          Winter Olympics 2026 {'\u00B7'} Milano Cortina
+        </p>
+        <p className="mt-2">
+          Created by{' '}
+          <a
+            href="https://robweidner.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-blue hover:text-blue-blueDark1 transition-colors"
+          >
+            Rob Weidner
+          </a>
         </p>
       </footer>
+
+      {showPicksModal && (
+        <PicksChoiceModal
+          onClose={() => setShowPicksModal(false)}
+          onBulkPicks={(player) => {
+            setShowPicksModal(false);
+            setBulkPicksPlayer(player);
+          }}
+        />
+      )}
     </div>
   );
 }

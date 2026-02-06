@@ -1,70 +1,70 @@
 /**
  * MedalCountCard - Displays top 10 countries by medal count
- * Uses field-limited queries and useMemo for performance
+ * Computes medals from Events table Gold/Silver/Bronze Country link fields
  */
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo } from 'react';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
-import { mapRecordToCountry } from '../helpers';
+import { mapRecordToCountry, computeMedalCounts } from '../helpers';
 
-const MEDAL_FIELDS = [
+// Fields needed from Events table to compute medals
+const EVENT_MEDAL_FIELDS = [
+  FIELD_IDS.EVENTS.YEAR,
+  FIELD_IDS.EVENTS.GOLD_COUNTRY,
+  FIELD_IDS.EVENTS.SILVER_COUNTRY,
+  FIELD_IDS.EVENTS.BRONZE_COUNTRY,
+];
+
+// Fields needed from Countries table for names
+const COUNTRY_NAME_FIELDS = [
   FIELD_IDS.COUNTRIES.NAME,
   FIELD_IDS.COUNTRIES.NOC,
-  FIELD_IDS.COUNTRIES.GOLD_MEDALS,
-  FIELD_IDS.COUNTRIES.SILVER_MEDALS,
-  FIELD_IDS.COUNTRIES.BRONZE_MEDALS,
-  FIELD_IDS.COUNTRIES.TOTAL_MEDALS,
 ];
 
 export function MedalCountCard() {
   const base = useBase();
+  const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
   const countriesTable = base.getTableByIdIfExists(TABLE_IDS.COUNTRIES);
 
-  // Fetch only the fields we need
-  const records = useRecords(countriesTable, { fields: MEDAL_FIELDS });
+  const eventRecords = useRecords(eventsTable, { fields: EVENT_MEDAL_FIELDS });
+  const countryRecords = useRecords(countriesTable, { fields: COUNTRY_NAME_FIELDS });
 
-  // Snapshot and sort data to prevent mid-render mutations
+  // Build country lookup map
+  const countryMap = useMemo(() => {
+    const map = new Map();
+    if (!countryRecords) return map;
+    for (const rec of countryRecords) {
+      map.set(rec.id, mapRecordToCountry(rec));
+    }
+    return map;
+  }, [countryRecords]);
+
+  // Compute 2026 medal counts from Events
   const topCountries = useMemo(() => {
-    if (!records) return [];
+    if (!eventRecords) return [];
+    return computeMedalCounts(eventRecords, countryMap, 2026).slice(0, 10);
+  }, [eventRecords, countryMap]);
 
-    return records
-      .map(mapRecordToCountry)
-      .filter((c) => c.total > 0)
-      .sort((a, b) => {
-        // Sort by gold first, then silver, then bronze, then total
-        if (b.gold !== a.gold) return b.gold - a.gold;
-        if (b.silver !== a.silver) return b.silver - a.silver;
-        if (b.bronze !== a.bronze) return b.bronze - a.bronze;
-        return b.total - a.total;
-      })
-      .slice(0, 10);
-  }, [records]);
-
-  // Handle missing table gracefully
-  if (!countriesTable) {
+  if (!eventsTable || !countriesTable) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-gray700">Medal Count</h2>
         <p className="text-sm text-gray-gray400 mb-4">Milano-Cortina 2026</p>
-        <p className="text-gray-gray400 text-sm">
-          Countries table not found. Make sure your base has a &quot;Countries&quot; table.
-        </p>
+        <p className="text-gray-gray400 text-sm">Tables not found.</p>
       </div>
     );
   }
 
-  // Handle empty state - show zeros with friendly message
   if (topCountries.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold text-gray-gray700">Medal Count</h2>
         <p className="text-sm text-gray-gray400 mb-4">Milano-Cortina 2026</p>
-
         <div className="text-center py-6">
           <div className="flex justify-center gap-8 mb-4">
-            <MedalPlaceholder emoji="🥇" label="Gold" />
-            <MedalPlaceholder emoji="🥈" label="Silver" />
-            <MedalPlaceholder emoji="🥉" label="Bronze" />
+            <MedalPlaceholder emoji={'\uD83E\uDD47'} label="Gold" />
+            <MedalPlaceholder emoji={'\uD83E\uDD48'} label="Silver" />
+            <MedalPlaceholder emoji={'\uD83E\uDD49'} label="Bronze" />
           </div>
           <p className="text-gray-gray500 text-sm">
             Tracking starts when the games begin!
@@ -96,9 +96,9 @@ export function MedalCountCard() {
             </div>
 
             <div className="flex items-center gap-4">
-              <MedalBadge emoji="🥇" count={country.gold} label="Gold" />
-              <MedalBadge emoji="🥈" count={country.silver} label="Silver" />
-              <MedalBadge emoji="🥉" count={country.bronze} label="Bronze" />
+              <MedalBadge emoji={'\uD83E\uDD47'} count={country.gold} label="Gold" />
+              <MedalBadge emoji={'\uD83E\uDD48'} count={country.silver} label="Silver" />
+              <MedalBadge emoji={'\uD83E\uDD49'} count={country.bronze} label="Bronze" />
               <span className="ml-2 font-semibold text-gray-gray700 min-w-[2rem] text-right">
                 {country.total}
               </span>
