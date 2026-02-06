@@ -75,7 +75,7 @@ export function ThemeToggle({ preference, onCycle }) {
   return (
     <button
       onClick={onCycle}
-      className="fixed bottom-4 right-4 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface border border-default shadow-theme-sm text-secondary text-xs font-medium transition-all hover:shadow-theme-md"
+      className="fixed bottom-4 left-4 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface border border-default shadow-theme-sm text-secondary text-xs font-medium transition-all hover:shadow-theme-md"
       title={`Theme: ${LABELS[preference]}. Click to cycle.`}
       aria-label={`Current theme: ${LABELS[preference]}. Click to change.`}
     >
