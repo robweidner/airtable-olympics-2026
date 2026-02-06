@@ -55,12 +55,45 @@ function mapRecordToBuild(record) {
 
 const INITIAL_VISIBLE = 5;
 
+function EmptyState() {
+  return (
+    <div className="bg-surface rounded-xl border border-default p-8 text-center">
+      <h3 className="text-lg font-semibold text-primary mb-2">
+        Coming Soon: Community Spotlight
+      </h3>
+      <p className="text-tertiary max-w-lg mx-auto mb-4 leading-relaxed">
+        As the Olympics unfold over the next two weeks, we&apos;ll feature
+        builders doing amazing things with this data. Interviews,
+        walkthroughs, and showcases &mdash; updated throughout the Games.
+      </p>
+      <p className="text-sm text-muted">
+        Built something? We want to see it.{' '}
+        <a
+          href={COMMUNITY_BUILDS_FORM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-blue hover:text-blue-blueDark1 font-medium"
+        >
+          Submit your build {'\u2192'}
+        </a>
+      </p>
+    </div>
+  );
+}
+
 export function CommunitySpotlight() {
-  const [showAll, setShowAll] = useState(false);
-  const [selectedBuild, setSelectedBuild] = useState(null);
   const base = useBase();
   const buildsTable = base.getTableByIdIfExists(TABLE_IDS.COMMUNITY_BUILDS);
-  const buildsRecords = useRecords(buildsTable, { fields: BUILD_FIELDS });
+
+  if (!buildsTable) return <EmptyState />;
+
+  return <CommunitySpotlightInner table={buildsTable} />;
+}
+
+function CommunitySpotlightInner({ table }) {
+  const [showAll, setShowAll] = useState(false);
+  const [selectedBuild, setSelectedBuild] = useState(null);
+  const buildsRecords = useRecords(table, { fields: BUILD_FIELDS });
 
   const builds = useMemo(() => {
     if (!buildsRecords) return [];
@@ -70,31 +103,7 @@ export function CommunitySpotlight() {
       .sort((a, b) => a.featureOrder - b.featureOrder);
   }, [buildsRecords]);
 
-  if (!buildsTable || builds.length === 0) {
-    return (
-      <div className="bg-surface rounded-xl border border-default p-8 text-center">
-        <h3 className="text-lg font-semibold text-primary mb-2">
-          Coming Soon: Community Spotlight
-        </h3>
-        <p className="text-tertiary max-w-lg mx-auto mb-4 leading-relaxed">
-          As the Olympics unfold over the next two weeks, we&apos;ll feature
-          builders doing amazing things with this data. Interviews,
-          walkthroughs, and showcases &mdash; updated throughout the Games.
-        </p>
-        <p className="text-sm text-muted">
-          Built something? We want to see it.{' '}
-          <a
-            href={COMMUNITY_BUILDS_FORM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-blue hover:text-blue-blueDark1 font-medium"
-          >
-            Submit your build {'\u2192'}
-          </a>
-        </p>
-      </div>
-    );
-  }
+  if (builds.length === 0) return <EmptyState />;
 
   const visibleBuilds = showAll ? builds : builds.slice(0, INITIAL_VISIBLE);
   const hasMore = builds.length > INITIAL_VISIBLE;
