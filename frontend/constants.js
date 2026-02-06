@@ -17,6 +17,7 @@ export const FIELD_IDS = {
     DISPLAY_NAME: 'fldnHOOvsNDHQaSgu',
     REGISTRATION_STATUS: 'fld3UvySUWlOUVnah',
     TOTAL_SCORE: 'fldwIM37gcLm15F5K',
+    PIN: 'fldsI6ihmz1jeGd0V',
   },
   COUNTRIES: {
     NAME: 'fldLAMQHm8YUtu8gO',           // "Country"

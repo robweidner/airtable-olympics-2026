@@ -12,7 +12,7 @@
 import { useSession } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { FIELD_IDS, PICKS_FORM_URL } from '../constants';
-import { getStringField } from '../helpers';
+import { getStringField, getNumberField } from '../helpers';
 
 export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulkPicks }) {
   const session = useSession();
@@ -26,14 +26,14 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
   const emailPinMatch = useMemo(() => {
     if (!submitted || !playerRecords) return null;
     const email = emailInput.toLowerCase().trim();
-    const pin = pinInput.trim().toLowerCase();
+    const pin = pinInput.trim();
     if (!email || !pin) return null;
 
     for (const r of playerRecords) {
       const status = r.getCellValue(FIELD_IDS.PLAYERS.REGISTRATION_STATUS);
       if (status?.name !== 'Approved') continue;
       const pEmail = getStringField(r, FIELD_IDS.PLAYERS.EMAIL).toLowerCase().trim();
-      const pPin = r.id.slice(-4).toLowerCase();
+      const pPin = String(getNumberField(r, FIELD_IDS.PLAYERS.PIN));
       if (pEmail === email && pPin === pin) {
         return {
           id: r.id,
@@ -157,7 +157,7 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
                   Verify your identity
                 </h3>
                 <p className="text-sm text-tertiary mt-1.5 max-w-xs mx-auto">
-                  Enter your email and 4-character PIN to access your picks.
+                  Enter your email and numeric PIN to access your picks.
                   It&apos;s a game, not a bank &mdash; the PIN just keeps things fair.
                 </p>
               </div>
@@ -182,18 +182,19 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulk
                   </label>
                   <input
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={pinInput}
-                    onChange={(e) => { setPinInput(e.target.value.slice(0, 4)); setSubmitted(false); }}
-                    placeholder="4-character PIN"
-                    maxLength={4}
+                    onChange={(e) => { setPinInput(e.target.value.replace(/\D/g, '')); setSubmitted(false); }}
+                    placeholder="Numeric PIN"
                     className="w-full border border-default rounded-lg px-3 py-2 bg-surface text-primary focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none text-sm font-mono tracking-widest"
                   />
                 </div>
                 <button
                   type="submit"
-                  disabled={!emailInput.trim() || pinInput.trim().length < 4}
+                  disabled={!emailInput.trim() || !pinInput.trim()}
                   className={`w-full px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-                    emailInput.trim() && pinInput.trim().length >= 4
+                    emailInput.trim() && pinInput.trim()
                       ? 'bg-blue-blue text-white hover:bg-blue-blueDark1'
                       : 'bg-surface-raised text-muted cursor-not-allowed'
                   }`}
