@@ -17,6 +17,7 @@ const EVENT_FIELDS = [
   FIELD_IDS.EVENTS.SPORT,
   FIELD_IDS.EVENTS.STATUS,
   FIELD_IDS.EVENTS.YEAR,
+  FIELD_IDS.EVENTS.DATE,
 ];
 
 const SPORT_FIELDS = [
@@ -187,7 +188,7 @@ export function BulkPicksView({ player, onClose }) {
     if (!picksTable || filledCount === 0) return;
 
     // Permission check
-    const perm = picksTable.hasPermissionToCreateRecord();
+    const perm = picksTable.checkPermissionsForCreateRecord();
     if (!perm.hasPermission) {
       alert('You do not have permission to create picks. ' + (perm.reasonDisplayString || ''));
       return;

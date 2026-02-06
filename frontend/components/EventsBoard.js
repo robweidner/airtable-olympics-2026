@@ -84,9 +84,25 @@ export function EventsBoard({ onMakeMyPicks }) {
         <h2 className="text-2xl font-display font-bold text-gray-gray800 text-center mb-2">
           {totalEvents} Medal Events
         </h2>
-        <p className="text-center text-gray-gray500 mb-8">
+        <p className="text-center text-gray-gray500 mb-6">
           Milano-Cortina 2026 — Pick your podium predictions across {sports.length} sports
         </p>
+
+        {/* Status legend */}
+        <div className="flex items-center justify-center gap-4 mb-6 text-xs text-gray-gray500">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-gray-gray300" />
+            Upcoming
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-yellow-yellow animate-pulse" />
+            Live
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-green" />
+            Final
+          </span>
+        </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {sports.map(sport => (
@@ -111,8 +127,10 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
 
   return (
     <div
-      className={`bg-gray-gray50 rounded-lg p-4 border transition-colors cursor-pointer ${
-        isExpanded ? 'border-blue-blue col-span-full' : 'border-gray-gray100 hover:border-blue-blueLight1'
+      className={`rounded-lg p-4 border transition-all duration-200 cursor-pointer ${
+        isExpanded
+          ? 'bg-white border-blue-blue shadow-md col-span-full'
+          : 'bg-gray-gray50 border-gray-gray100 hover:border-blue-blueLight1 hover:shadow-sm'
       }`}
       onClick={onToggle}
       role="button"
@@ -122,37 +140,45 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
       }}
       aria-expanded={isExpanded}
     >
+      {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{sport.icon || '🏅'}</span>
         <h3 className="font-semibold text-gray-gray800 truncate">{sport.name}</h3>
         <span className="ml-auto text-xs bg-blue-blueLight2 text-blue-blueDark1 px-2 py-0.5 rounded-full flex-shrink-0">
           {events.length}
         </span>
-        <span className="text-gray-gray400 text-xs">{isExpanded ? '▲' : '▼'}</span>
+        <span className={`text-xs transition-transform duration-200 ${isExpanded ? 'text-blue-blue' : 'text-gray-gray400'}`}>
+          {isExpanded ? '▲' : '▼'}
+        </span>
       </div>
 
-      <ul className="space-y-1 text-sm">
+      {/* Event list */}
+      <ul className={`space-y-1 text-sm ${isExpanded ? 'columns-1 sm:columns-2 lg:columns-3 gap-x-6' : ''}`}>
         {displayEvents.map(event => (
-          <li key={event.id} className="flex items-center gap-2 text-gray-gray600">
+          <li key={event.id} className="flex items-center gap-2 text-gray-gray600 break-inside-avoid">
             <StatusDot status={event.status} />
-            <span className="truncate">{event.name}</span>
+            <span className={isExpanded ? '' : 'truncate'}>{event.name}</span>
           </li>
         ))}
       </ul>
 
+      {/* Collapsed: prompt to expand */}
       {!isExpanded && hasMore && (
-        <p className="text-blue-blue text-xs pt-2 font-medium">
+        <p className="text-blue-blue text-xs pt-2 font-medium hover:text-blue-blueDark1">
           View all {events.length} events ▼
         </p>
       )}
 
+      {/* Expanded: CTA */}
       {isExpanded && onMakeMyPicks && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onMakeMyPicks(); }}
-          className="mt-3 w-full py-2 bg-blue-blue text-white text-sm font-medium rounded-md hover:bg-blue-blueDark1 transition-colors"
-        >
-          Make My Picks
-        </button>
+        <div className="mt-4 pt-3 border-t border-gray-gray100">
+          <button
+            onClick={(e) => { e.stopPropagation(); onMakeMyPicks(); }}
+            className="w-full py-2 bg-blue-blue text-white text-sm font-medium rounded-md hover:bg-blue-blueDark1 transition-colors"
+          >
+            Make My Picks
+          </button>
+        </div>
       )}
     </div>
   );
