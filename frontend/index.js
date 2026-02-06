@@ -51,7 +51,7 @@ function FantasyOlympicsLanding() {
       <Beijing2022Recap />
 
       {/* Events Board */}
-      <EventsBoard />
+      <EventsBoard onMakeMyPicks={() => setShowPicksModal(true)} />
 
       {/* Builder Section */}
       <BuilderSection />

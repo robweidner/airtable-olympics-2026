@@ -125,6 +125,7 @@ export function mapRecordToEvent(record) {
     date: record.getCellValue(FIELD_IDS.EVENTS.DATE),
     status: statusValue?.name ?? 'Upcoming',
     venue: getStringField(record, FIELD_IDS.EVENTS.VENUE),
+    year: getNumberField(record, FIELD_IDS.EVENTS.YEAR),
   };
 }
 

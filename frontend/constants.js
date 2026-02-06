@@ -13,6 +13,7 @@ export const TABLE_IDS = {
 export const FIELD_IDS = {
   PLAYERS: {
     NAME: 'fldrRQK2luH5JTkRV',
+    EMAIL: 'fldE3G9x9Oq2p9f5A',
     DISPLAY_NAME: 'fldnHOOvsNDHQaSgu',
     REGISTRATION_STATUS: 'fld3UvySUWlOUVnah',
     TOTAL_SCORE: 'fldwIM37gcLm15F5K',

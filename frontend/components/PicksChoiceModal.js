@@ -1,24 +1,31 @@
 /**
  * PicksChoiceModal - "Make My Picks" entry point.
- * Player selects their name, then chooses one-at-a-time (form) or all-at-once (bulk).
+ *
+ * Auto-detects the logged-in Airtable user via useSession().currentUser.email
+ * and matches against the Players table Email field. If matched, skips the
+ * "Who are you?" step. Falls back to a manual dropdown if no match.
  */
-import { useBase, useRecords } from '@airtable/blocks/interface/ui';
+import { useBase, useRecords, useSession } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS, PICKS_FORM_URL } from '../constants';
 import { getStringField } from '../helpers';
 
 const PLAYER_FIELDS = [
+  FIELD_IDS.PLAYERS.NAME,
+  FIELD_IDS.PLAYERS.EMAIL,
   FIELD_IDS.PLAYERS.DISPLAY_NAME,
   FIELD_IDS.PLAYERS.REGISTRATION_STATUS,
 ];
 
 export function PicksChoiceModal({ onClose, onBulkPicks }) {
   const base = useBase();
+  const session = useSession();
   const playersTable = base.getTableByIdIfExists(TABLE_IDS.PLAYERS);
   const playerRecords = useRecords(playersTable, { fields: PLAYER_FIELDS });
 
-  const [selectedPlayerId, setSelectedPlayerId] = useState('');
+  const [manualPlayerId, setManualPlayerId] = useState('');
 
+  // Build list of approved players
   const approvedPlayers = useMemo(() => {
     if (!playerRecords) return [];
     return playerRecords
@@ -28,24 +35,42 @@ export function PicksChoiceModal({ onClose, onBulkPicks }) {
       })
       .map((r) => ({
         id: r.id,
-        displayName: getStringField(r, FIELD_IDS.PLAYERS.DISPLAY_NAME),
+        email: getStringField(r, FIELD_IDS.PLAYERS.EMAIL),
+        displayName: getStringField(r, FIELD_IDS.PLAYERS.DISPLAY_NAME)
+          || getStringField(r, FIELD_IDS.PLAYERS.NAME),
       }))
       .sort((a, b) => a.displayName.localeCompare(b.displayName));
   }, [playerRecords]);
 
-  const selectedPlayer = approvedPlayers.find((p) => p.id === selectedPlayerId);
+  // Try to auto-match the logged-in user by email
+  const currentUserEmail = session.currentUser?.email?.toLowerCase();
+  const autoMatchedPlayer = useMemo(() => {
+    if (!currentUserEmail) return null;
+    return approvedPlayers.find(
+      (p) => p.email.toLowerCase() === currentUserEmail
+    ) || null;
+  }, [approvedPlayers, currentUserEmail]);
+
+  // Resolved player: auto-matched takes priority, otherwise manual selection
+  const resolvedPlayer = autoMatchedPlayer
+    || approvedPlayers.find((p) => p.id === manualPlayerId)
+    || null;
+
+  const isAutoMatched = !!autoMatchedPlayer;
 
   function handleOneByOne() {
-    if (!selectedPlayerId) return;
-    const url = `${PICKS_FORM_URL}?prefill_Player=${selectedPlayerId}&hide_Player=true`;
+    if (!resolvedPlayer) return;
+    const url = `${PICKS_FORM_URL}?prefill_Player=${resolvedPlayer.id}&hide_Player=true`;
     window.open(url, '_blank');
     onClose();
   }
 
   function handleBulk() {
-    if (!selectedPlayer) return;
-    onBulkPicks({ id: selectedPlayer.id, name: selectedPlayer.displayName });
+    if (!resolvedPlayer) return;
+    onBulkPicks({ id: resolvedPlayer.id, name: resolvedPlayer.displayName });
   }
+
+  const hasPlayer = !!resolvedPlayer;
 
   return (
     <div
@@ -68,24 +93,43 @@ export function PicksChoiceModal({ onClose, onBulkPicks }) {
         </div>
 
         <div className="px-6 py-5 space-y-5">
-          {/* Player selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-gray700 mb-1">
-              Who are you?
-            </label>
-            <select
-              value={selectedPlayerId}
-              onChange={(e) => setSelectedPlayerId(e.target.value)}
-              className="w-full border border-gray-gray200 rounded-lg px-3 py-2 text-gray-gray800 focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none"
-            >
-              <option value="">Select your name...</option>
-              {approvedPlayers.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.displayName}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Player identification */}
+          {isAutoMatched ? (
+            <div className="flex items-center gap-3 p-3 bg-green-greenLight3 rounded-lg border border-green-greenLight1">
+              <span className="text-lg">👋</span>
+              <div>
+                <p className="font-medium text-gray-gray800">
+                  Hey, {autoMatchedPlayer.displayName}!
+                </p>
+                <p className="text-xs text-gray-gray500">
+                  Matched by your Airtable account
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-medium text-gray-gray700 mb-1">
+                Who are you?
+              </label>
+              <select
+                value={manualPlayerId}
+                onChange={(e) => setManualPlayerId(e.target.value)}
+                className="w-full border border-gray-gray200 rounded-lg px-3 py-2 text-gray-gray800 focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none"
+              >
+                <option value="">Select your name...</option>
+                {approvedPlayers.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.displayName}
+                  </option>
+                ))}
+              </select>
+              {currentUserEmail && approvedPlayers.length > 0 && (
+                <p className="text-xs text-gray-gray400 mt-1">
+                  No player found for {session.currentUser?.email}. Select manually.
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Option cards */}
           <div className="space-y-3">
@@ -94,9 +138,9 @@ export function PicksChoiceModal({ onClose, onBulkPicks }) {
             {/* One by one */}
             <button
               onClick={handleOneByOne}
-              disabled={!selectedPlayerId}
+              disabled={!hasPlayer}
               className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                selectedPlayerId
+                hasPlayer
                   ? 'border-gray-gray200 hover:border-blue-blue hover:bg-blue-blueLight3 cursor-pointer'
                   : 'border-gray-gray100 opacity-50 cursor-not-allowed'
               }`}
@@ -115,9 +159,9 @@ export function PicksChoiceModal({ onClose, onBulkPicks }) {
             {/* Bulk */}
             <button
               onClick={handleBulk}
-              disabled={!selectedPlayerId}
+              disabled={!hasPlayer}
               className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                selectedPlayerId
+                hasPlayer
                   ? 'border-gray-gray200 hover:border-blue-blue hover:bg-blue-blueLight3 cursor-pointer'
                   : 'border-gray-gray100 opacity-50 cursor-not-allowed'
               }`}
