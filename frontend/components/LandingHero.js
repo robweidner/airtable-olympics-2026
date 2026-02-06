@@ -1,6 +1,8 @@
 /**
  * LandingHero - Main hero section with headline and CTAs
  */
+import { CountdownTimer } from './CountdownTimer';
+
 export function LandingHero() {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-gray-gray50 via-white to-blue-blueLight3 py-12 px-4 sm:py-16 sm:px-8 text-center">
@@ -23,10 +25,12 @@ export function LandingHero() {
           <span className="block text-blue-blue">on Airtable</span>
         </h1>
 
-        <p className="text-lg sm:text-xl text-gray-gray500 mb-8 max-w-xl mx-auto">
+        <p className="text-lg sm:text-xl text-gray-gray500 mb-6 max-w-xl mx-auto">
           Predict the podium. Climb the leaderboard.
           Or build something entirely new with live Olympic data.
         </p>
+
+        <CountdownTimer />
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button

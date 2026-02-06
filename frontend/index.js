@@ -4,6 +4,7 @@ import './style.css';
 import { LandingHero } from './components/LandingHero';
 import { MedalCountCard } from './components/MedalCountCard';
 import { LeaderboardCard } from './components/LeaderboardCard';
+import { EventsBoard } from './components/EventsBoard';
 import { BuilderSection } from './components/BuilderSection';
 
 function FantasyOlympicsLanding() {
@@ -19,6 +20,9 @@ function FantasyOlympicsLanding() {
           <LeaderboardCard />
         </div>
       </section>
+
+      {/* Events Board */}
+      <EventsBoard />
 
       {/* Builder Section */}
       <BuilderSection />

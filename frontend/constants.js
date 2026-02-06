@@ -22,4 +22,19 @@ export const FIELD_IDS = {
     BRONZE_MEDALS: 'fldJKgbz9CNxFlvjQ',
     TOTAL_MEDALS: 'fldOHM0Ama2hYcc6l',
   },
+  EVENTS: {
+    NAME: 'fldb43P9bv3dqKPVO',            // "Event Name"
+    SPORT: 'fldGXQoyPOMoybQLc',           // Link to Sports
+    DATE: 'fldAg9QHylhrQcPHr',
+    STATUS: 'fldyXuvmxMH8av5J9',
+    VENUE: 'fldGkYYWMuFsSBD2D',
+  },
+  SPORTS: {
+    NAME: 'fldE3FUUczhsQ0J0f',            // "Sport Name"
+    ICON: 'fldcS4B5hY2FQJNdU',
+    EVENT_COUNT: 'fldW0JMVkw084Bd4L',
+  },
 };
+
+// Opening Ceremonies: Feb 6, 2026, 20:00 CET (UTC+1)
+export const OPENING_CEREMONY_DATE = new Date('2026-02-06T19:00:00Z');

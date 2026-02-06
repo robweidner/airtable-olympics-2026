@@ -51,3 +51,31 @@ export function mapRecordToPlayer(record) {
     totalScore: getNumberField(record, FIELD_IDS.PLAYERS.TOTAL_SCORE),
   };
 }
+
+/**
+ * Map an Airtable record to an Event data object
+ */
+export function mapRecordToEvent(record) {
+  const sportLink = record.getCellValue(FIELD_IDS.EVENTS.SPORT);
+  const statusValue = record.getCellValue(FIELD_IDS.EVENTS.STATUS);
+  return {
+    id: record.id,
+    name: getStringField(record, FIELD_IDS.EVENTS.NAME),
+    sportId: sportLink?.[0]?.id ?? null,
+    date: record.getCellValue(FIELD_IDS.EVENTS.DATE),
+    status: statusValue?.name ?? 'Upcoming',
+    venue: getStringField(record, FIELD_IDS.EVENTS.VENUE),
+  };
+}
+
+/**
+ * Map an Airtable record to a Sport data object
+ */
+export function mapRecordToSport(record) {
+  return {
+    id: record.id,
+    name: getStringField(record, FIELD_IDS.SPORTS.NAME),
+    icon: getStringField(record, FIELD_IDS.SPORTS.ICON),
+    eventCount: getNumberField(record, FIELD_IDS.SPORTS.EVENT_COUNT),
+  };
+}

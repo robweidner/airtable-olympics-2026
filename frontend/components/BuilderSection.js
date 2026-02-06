@@ -28,20 +28,20 @@ export function BuilderSection() {
         </h2>
         <p className="text-center text-gray-gray500 mb-12 max-w-2xl mx-auto">
           Whether you&apos;re new to Airtable or a seasoned builder, we&apos;ve got you covered.
-          Get live Olympic data and build your own experience.
+          Start with 2022 Olympics data now, and 2026 results will populate live during the games.
         </p>
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Basic Tier */}
           <TierCard
             tier="Basic"
-            title="Sync the Data"
-            description="Add live Olympic data to your base with one click. Countries, athletes, events, and results — always up to date."
+            title="Sync Historical Data"
+            description="Add 2022 Winter Olympics data to your base. Perfect for practice building — see what a complete dataset looks like before 2026 goes live."
             color="green"
             features={[
-              'Live synced tables',
-              'Real-time medal updates',
-              'No maintenance required',
+              '2022 Beijing Olympics data',
+              'Complete results & medals',
+              'Build & test your ideas now',
             ]}
           >
             <div className="space-y-2">
