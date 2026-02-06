@@ -31,17 +31,21 @@ export function PicksChoiceModal({ onClose }) {
         </div>
 
         <div className="px-6 py-5 space-y-4">
+          <p className="text-sm text-secondary">
+            Already signed in to Airtable? You&apos;ll go straight to the
+            picks form. Otherwise, you&apos;ll be asked to create a free
+            account first &mdash; it only takes a moment.
+          </p>
+
           <button
             onClick={handleOpenForm}
             className="w-full py-2.5 px-4 bg-blue-blue hover:bg-blue-blueDark1 text-white font-medium text-sm rounded-lg transition-colors"
           >
             Open Picks Form
           </button>
+
           <p className="text-xs text-center text-muted">
-            You may be asked to sign in to Airtable &mdash; it&apos;s
-            completely free. Select your picks, explore the data we&apos;ve
-            provided, and stay tuned &mdash; we&apos;re working on a way to
-            make all your picks at once.
+            More ways to pick are coming soon &mdash; stay tuned.
           </p>
         </div>
       </div>
