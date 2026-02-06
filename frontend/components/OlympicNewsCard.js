@@ -1,7 +1,6 @@
 /**
- * OlympicNewsCard - Displays AI-generated Olympic news feed
+ * OlympicNewsCard - Displays Olympic news feed
  * Shows published news items sorted by creation date (newest first)
- * AI Content field is preferred; falls back to Body field for seed records
  */
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
@@ -12,10 +11,9 @@ const NEWS_FIELDS = [
   FIELD_IDS.OLYMPIC_NEWS.HEADLINE,
   FIELD_IDS.OLYMPIC_NEWS.BODY,
   FIELD_IDS.OLYMPIC_NEWS.CATEGORY,
-  FIELD_IDS.OLYMPIC_NEWS.UPDATE_SLOT,
+  FIELD_IDS.OLYMPIC_NEWS.PUBLISHED_TIME_SLOT,
   FIELD_IDS.OLYMPIC_NEWS.STATUS,
   FIELD_IDS.OLYMPIC_NEWS.DAY_NUMBER,
-  FIELD_IDS.OLYMPIC_NEWS.AI_CONTENT,
   FIELD_IDS.OLYMPIC_NEWS.CREATED,
 ];
 
@@ -28,21 +26,19 @@ const CATEGORY_STYLES = {
   'Breaking': { bg: 'bg-red-redDark1', text: 'text-white' },
 };
 
-const DEFAULT_STYLE = { bg: 'bg-gray-gray200', text: 'text-gray-gray700' };
+const DEFAULT_STYLE = { bg: 'bg-gray-gray200 dark:bg-gray-gray600', text: 'text-gray-gray700 dark:text-gray-gray200' };
 
 function mapRecordToNewsItem(record) {
   const statusVal = record.getCellValue(FIELD_IDS.OLYMPIC_NEWS.STATUS);
   const categoryVal = record.getCellValue(FIELD_IDS.OLYMPIC_NEWS.CATEGORY);
-  const slotVal = record.getCellValue(FIELD_IDS.OLYMPIC_NEWS.UPDATE_SLOT);
-  const aiContent = getStringField(record, FIELD_IDS.OLYMPIC_NEWS.AI_CONTENT);
-  const body = getStringField(record, FIELD_IDS.OLYMPIC_NEWS.BODY);
+  const timeSlot = getStringField(record, FIELD_IDS.OLYMPIC_NEWS.PUBLISHED_TIME_SLOT);
 
   return {
     id: record.id,
     headline: getStringField(record, FIELD_IDS.OLYMPIC_NEWS.HEADLINE),
-    body: aiContent || body,
+    body: getStringField(record, FIELD_IDS.OLYMPIC_NEWS.BODY),
     category: categoryVal?.name ?? '',
-    updateSlot: slotVal?.name ?? '',
+    timeSlot,
     status: statusVal?.name ?? 'Draft',
     dayNumber: getNumberField(record, FIELD_IDS.OLYMPIC_NEWS.DAY_NUMBER),
     created: record.getCellValue(FIELD_IDS.OLYMPIC_NEWS.CREATED),
@@ -86,21 +82,21 @@ export function OlympicNewsCard() {
 
   if (!newsTable) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-gray700">Live from Milano Cortina</h2>
-        <p className="text-gray-gray400 text-sm mt-2">News table not found.</p>
+      <div className="bg-surface rounded-lg shadow-theme-md p-6">
+        <h2 className="text-xl font-semibold text-secondary">Live from Milano Cortina</h2>
+        <p className="text-muted text-sm mt-2">News table not found.</p>
       </div>
     );
   }
 
   if (newsItems.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-gray700">Live from Milano Cortina</h2>
-        <p className="text-sm text-gray-gray400 mb-4">Olympic News</p>
+      <div className="bg-surface rounded-lg shadow-theme-md p-6">
+        <h2 className="text-xl font-semibold text-secondary">Live from Milano Cortina</h2>
+        <p className="text-sm text-muted mb-4">Olympic News</p>
         <div className="text-center py-8">
           <p className="text-2xl mb-2">{'\uD83C\uDFBF'}</p>
-          <p className="text-gray-gray500 text-sm">
+          <p className="text-tertiary text-sm">
             News updates start when the games begin!
           </p>
         </div>
@@ -112,13 +108,13 @@ export function OlympicNewsCard() {
   const hasMore = newsItems.length > INITIAL_VISIBLE;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-surface rounded-lg shadow-theme-md p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-gray700">Live from Milano Cortina</h2>
-          <p className="text-sm text-gray-gray400">Olympic News</p>
+          <h2 className="text-xl font-semibold text-secondary">Live from Milano Cortina</h2>
+          <p className="text-sm text-muted">Olympic News</p>
         </div>
-        <span className="text-xs text-gray-gray400">
+        <span className="text-xs text-muted">
           {newsItems.length} {newsItems.length === 1 ? 'update' : 'updates'}
         </span>
       </div>
@@ -148,7 +144,7 @@ function NewsItem({ item }) {
   const displayBody = isLong && !expanded ? item.body.slice(0, 200) + '...' : item.body;
 
   return (
-    <div className="border-b border-gray-gray100 last:border-b-0 pb-4 last:pb-0">
+    <div className="border-b border-light last:border-b-0 pb-4 last:pb-0">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -159,18 +155,18 @@ function NewsItem({ item }) {
                 {item.category}
               </span>
             )}
-            {item.updateSlot && (
-              <span className="text-xs text-gray-gray400">{item.updateSlot}</span>
+            {item.timeSlot && (
+              <span className="text-xs text-muted">{item.timeSlot}</span>
             )}
           </div>
 
           {item.headline && (
-            <h3 className="font-semibold text-gray-gray800 text-sm leading-snug">
+            <h3 className="font-semibold text-primary text-sm leading-snug">
               {item.headline}
             </h3>
           )}
 
-          <p className="text-sm text-gray-gray600 mt-1 leading-relaxed whitespace-pre-line">
+          <p className="text-sm text-body mt-1 leading-relaxed whitespace-pre-line">
             {displayBody}
           </p>
 
@@ -184,7 +180,7 @@ function NewsItem({ item }) {
           )}
         </div>
 
-        <span className="text-xs text-gray-gray400 whitespace-nowrap flex-shrink-0 mt-0.5">
+        <span className="text-xs text-muted whitespace-nowrap flex-shrink-0 mt-0.5">
           {formatRelativeTime(item.created)}
         </span>
       </div>

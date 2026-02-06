@@ -51,15 +51,13 @@ export const FIELD_IDS = {
     EVENT_COUNT: 'fldW0JMVkw084Bd4L',
   },
   OLYMPIC_NEWS: {
-    HEADLINE: 'fldmxgFAJoqKgVaeG',         // Single line text (primary field)
-    BODY: 'fldffsLZ3NwWzQpiZ',             // Long text (manual content / fallback)
-    PUBLISHED_DATE: 'fldlCDPe3LYFNZsos',   // DateTime
-    UPDATE_SLOT: 'fldV5Zmm49rAXFmsb',      // Single select: Morning/Midday/Evening
-    CATEGORY: 'fldTg92EosRNWOvao',         // Single select: Results Recap, Athlete Spotlight, etc.
-    DAY_NUMBER: 'fld1OJCIsO1BxgRuU',       // Number (Olympics day 0-17)
-    STATUS: 'fldEouPyGs8pBDvbe',           // Single select: Draft/Published/Hidden
-    AI_CONTENT: 'fldL9nIs67k3woj06',       // AI text field (web search generated)
-    CREATED: 'fldA98fYswKlWG9M3',          // Created time (auto)
+    HEADLINE: 'fldmxgFAJoqKgVaeG',              // Single line text (primary field)
+    BODY: 'fldffsLZ3NwWzQpiZ',                  // Long text (AI-generated news content)
+    CATEGORY: 'fldTg92EosRNWOvao',              // Single select: Results Recap, Athlete Spotlight, etc.
+    DAY_NUMBER: 'fld1OJCIsO1BxgRuU',            // Formula (Olympics day 0-17)
+    PUBLISHED_TIME_SLOT: 'fld1nQWBId5oOig0i',   // Formula: Morning/Midday/Evening based on hour
+    STATUS: 'fldEouPyGs8pBDvbe',                // Single select: Draft/Published/Hidden
+    CREATED: 'fldA98fYswKlWG9M3',               // Created time (auto)
   },
 };
 
