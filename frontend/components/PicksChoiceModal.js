@@ -5,30 +5,64 @@
  * straight to pick method selection.
  *
  * When no currentPlayer exists (non-collaborators on shared interfaces),
- * shows a welcoming prompt to sign up or sign in to Airtable.
+ * asks for email + 4-character PIN to identify the player. The PIN is the
+ * last 4 characters of the player's Airtable record ID — lightweight
+ * verification for a game, not a bank.
  */
 import { useSession } from '@airtable/blocks/interface/ui';
-import { PICKS_FORM_URL, INTERFACE_URL } from '../constants';
+import { useMemo, useState } from 'react';
+import { FIELD_IDS, PICKS_FORM_URL } from '../constants';
+import { getStringField } from '../helpers';
 
-// Build auth redirect URLs from the shared interface URL
-const interfacePath = new URL(INTERFACE_URL).pathname;
-const SIGN_UP_URL = `https://airtable.com/signup?continue=${encodeURIComponent(interfacePath)}`;
-const SIGN_IN_URL = `https://airtable.com/login?continue=${encodeURIComponent(interfacePath)}`;
-
-export function PicksChoiceModal({ currentPlayer, onClose, onBulkPicks }) {
+export function PicksChoiceModal({ currentPlayer, playerRecords, onClose, onBulkPicks }) {
   const session = useSession();
   const isCollaborator = !!session.currentUser;
 
+  const [emailInput, setEmailInput] = useState('');
+  const [pinInput, setPinInput] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  // Match email + PIN against player records
+  const emailPinMatch = useMemo(() => {
+    if (!submitted || !playerRecords) return null;
+    const email = emailInput.toLowerCase().trim();
+    const pin = pinInput.trim().toLowerCase();
+    if (!email || !pin) return null;
+
+    for (const r of playerRecords) {
+      const status = r.getCellValue(FIELD_IDS.PLAYERS.REGISTRATION_STATUS);
+      if (status?.name !== 'Approved') continue;
+      const pEmail = getStringField(r, FIELD_IDS.PLAYERS.EMAIL).toLowerCase().trim();
+      const pPin = r.id.slice(-4).toLowerCase();
+      if (pEmail === email && pPin === pin) {
+        return {
+          id: r.id,
+          displayName: getStringField(r, FIELD_IDS.PLAYERS.DISPLAY_NAME)
+            || getStringField(r, FIELD_IDS.PLAYERS.NAME),
+        };
+      }
+    }
+    return null;
+  }, [submitted, emailInput, pinInput, playerRecords]);
+
+  // Resolved player: collaborator match takes priority, then email+PIN match
+  const resolvedPlayer = currentPlayer || emailPinMatch;
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitted(true);
+  }
+
   function handleOneByOne() {
-    if (!currentPlayer) return;
-    const url = `${PICKS_FORM_URL}?prefill_Player=${currentPlayer.id}&hide_Player=true`;
+    if (!resolvedPlayer) return;
+    const url = `${PICKS_FORM_URL}?prefill_Player=${resolvedPlayer.id}&hide_Player=true`;
     window.open(url, '_blank');
     onClose();
   }
 
   function handleBulk() {
-    if (!currentPlayer) return;
-    onBulkPicks({ id: currentPlayer.id, name: currentPlayer.displayName });
+    if (!resolvedPlayer) return;
+    onBulkPicks({ id: resolvedPlayer.id, name: resolvedPlayer.displayName });
   }
 
   return (
@@ -52,17 +86,27 @@ export function PicksChoiceModal({ currentPlayer, onClose, onBulkPicks }) {
         </div>
 
         <div className="px-6 py-5 space-y-5">
-          {currentPlayer ? (
+          {resolvedPlayer ? (
             <>
               {/* Greeting */}
               <div className="flex items-center gap-3 p-3 bg-green-greenLight3 dark:bg-green-greenDark1/20 rounded-lg border border-green-greenLight1 dark:border-green-greenDark1/40">
                 <span className="text-lg">👋</span>
                 <div>
                   <p className="font-medium text-primary">
-                    Hey, {currentPlayer.displayName}!
+                    Hey, {resolvedPlayer.displayName}!
                   </p>
                   <p className="text-xs text-tertiary">
-                    Matched by your Airtable account
+                    {currentPlayer ? 'Matched by your Airtable account' : (
+                      <>
+                        Matched by email &middot;{' '}
+                        <button
+                          onClick={() => { setSubmitted(false); setEmailInput(''); setPinInput(''); }}
+                          className="text-blue-blue hover:text-blue-blueDark1"
+                        >
+                          Not you?
+                        </button>
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -106,37 +150,65 @@ export function PicksChoiceModal({ currentPlayer, onClose, onBulkPicks }) {
             </>
           ) : (
             <>
-              {/* Sign up / sign in prompt */}
-              <div className="text-center py-2">
-                <span className="text-4xl">🏅</span>
-                <h3 className="text-lg font-semibold text-primary mt-3">
-                  Create a free account to play
+              {/* Email + PIN identification */}
+              <div className="text-center py-1">
+                <span className="text-3xl">🏅</span>
+                <h3 className="text-lg font-semibold text-primary mt-2">
+                  Verify your identity
                 </h3>
-                <p className="text-sm text-tertiary mt-2 max-w-xs mx-auto">
-                  This isn&apos;t a marketing thing &mdash; the game runs on Airtable,
-                  so you need a free account to track your picks.
+                <p className="text-sm text-tertiary mt-1.5 max-w-xs mx-auto">
+                  Enter your email and 4-character PIN to access your picks.
+                  It&apos;s a game, not a bank &mdash; the PIN just keeps things fair.
                 </p>
               </div>
 
-              <div className="space-y-3">
-                <a
-                  href={SIGN_UP_URL}
-                  target="_top"
-                  className="block w-full text-center px-4 py-3 bg-blue-blue hover:bg-blue-blueDark1 text-white font-semibold rounded-lg transition-colors"
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-secondary mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={emailInput}
+                    onChange={(e) => { setEmailInput(e.target.value); setSubmitted(false); }}
+                    placeholder="you@example.com"
+                    className="w-full border border-default rounded-lg px-3 py-2 bg-surface text-primary focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none text-sm"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-secondary mb-1">
+                    PIN
+                  </label>
+                  <input
+                    type="text"
+                    value={pinInput}
+                    onChange={(e) => { setPinInput(e.target.value.slice(0, 4)); setSubmitted(false); }}
+                    placeholder="4-character PIN"
+                    maxLength={4}
+                    className="w-full border border-default rounded-lg px-3 py-2 bg-surface text-primary focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none text-sm font-mono tracking-widest"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!emailInput.trim() || pinInput.trim().length < 4}
+                  className={`w-full px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+                    emailInput.trim() && pinInput.trim().length >= 4
+                      ? 'bg-blue-blue text-white hover:bg-blue-blueDark1'
+                      : 'bg-surface-raised text-muted cursor-not-allowed'
+                  }`}
                 >
-                  Sign Up — it&apos;s free
-                </a>
-                <a
-                  href={SIGN_IN_URL}
-                  target="_top"
-                  className="block w-full text-center px-4 py-3 bg-surface hover:bg-surface-raised text-secondary font-medium rounded-lg border border-default transition-colors"
-                >
-                  I already have an account
-                </a>
-              </div>
+                  Let&apos;s Go
+                </button>
+                {submitted && !emailPinMatch && (
+                  <p className="text-xs text-red-red text-center">
+                    No match found. Check your email and PIN, or ask the game organizer for help.
+                  </p>
+                )}
+              </form>
 
               <p className="text-xs text-center text-muted">
-                You&apos;ll come right back here after signing in.
+                Don&apos;t have a PIN? Ask the person who invited you to the game.
               </p>
             </>
           )}
