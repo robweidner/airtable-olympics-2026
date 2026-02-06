@@ -10,12 +10,6 @@ const BASE_ID = 'appoY3nwpfUnUut4P';
 // Featured tables — shown with embedded Airtable previews
 const FEATURED_TABLES = [
   {
-    label: 'Results',
-    detail: 'Live — updates as medals are awarded',
-    shareToken: 'shrYpNoFK6wEg2JP6',
-    embedSrc: `https://airtable.com/embed/${BASE_ID}/shrYpNoFK6wEg2JP6?viewControls=on`,
-  },
-  {
     label: 'Countries',
     detail: '90 nations + medal counts',
     shareToken: 'shr632RQw5PdSJgoY',
@@ -96,7 +90,7 @@ export function BuilderSection() {
               'Live 2026 results as events finish',
               'Full event schedule & country data',
               'Automatic 15-minute refresh',
-              '8 tables available to sync',
+              '7 tables available to sync',
             ]}
           >
             <button
