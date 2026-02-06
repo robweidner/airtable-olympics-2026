@@ -29,3 +29,118 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* =============================================================
+ * Dark Mode — Semantic Color Tokens
+ * =============================================================
+ * Light values live in :root, dark overrides in .dark.
+ * Components use the semantic utilities below (bg-surface, text-primary, etc.)
+ * so they auto-swap when the .dark class toggles on <div> root.
+ */
+
+:root {
+  /* Surfaces */
+  --color-surface:        255, 255, 255;           /* white */
+  --color-surface-page:   246, 248, 252;           /* gray50 */
+  --color-surface-raised: 242, 244, 248;           /* gray75 */
+  --color-surface-inset:  249, 250, 251;           /* gray25 */
+
+  /* Text */
+  --color-text-primary:   29, 31, 37;              /* gray800 */
+  --color-text-secondary: 49, 53, 62;              /* gray700 */
+  --color-text-body:      65, 69, 77;              /* gray600 */
+  --color-text-tertiary:  97, 102, 112;            /* gray500 */
+  --color-text-muted:     151, 154, 160;           /* gray400 */
+
+  /* Borders */
+  --color-border-light:   229, 233, 240;           /* gray100 */
+  --color-border-default: 218, 222, 230;           /* gray200 */
+  --color-border-strong:  196, 199, 205;           /* gray300 */
+
+  /* Backdrop */
+  --color-backdrop:       0, 0, 0;
+
+  /* Shadows */
+  --shadow-xs: 0px 0px 1px rgba(0,0,0,0.32), 0px 0px 2px rgba(0,0,0,0.08), 0px 1px 3px rgba(0,0,0,0.08);
+  --shadow-sm: 0px 0px 1px rgba(0,0,0,0.32), 0px 0px 3px rgba(0,0,0,0.11), 0px 1px 4px rgba(0,0,0,0.12);
+  --shadow-md: 0px 0px 1px rgba(0,0,0,0.24), 0px 0px 2px rgba(0,0,0,0.08), 0px 2px 4px rgba(0,0,0,0.08);
+}
+
+.dark {
+  /* Surfaces */
+  --color-surface:        30, 32, 38;              /* near gray900 */
+  --color-surface-page:   17, 18, 21;              /* gray900 */
+  --color-surface-raised: 42, 45, 52;
+  --color-surface-inset:  24, 25, 30;
+
+  /* Text */
+  --color-text-primary:   242, 244, 248;           /* gray75 */
+  --color-text-secondary: 229, 233, 240;           /* gray100 */
+  --color-text-body:      218, 222, 230;           /* gray200 */
+  --color-text-tertiary:  196, 199, 205;           /* gray300 */
+  --color-text-muted:     151, 154, 160;           /* gray400 */
+
+  /* Borders */
+  --color-border-light:   42, 45, 52;
+  --color-border-default: 55, 58, 66;
+  --color-border-strong:  75, 79, 88;
+
+  /* Backdrop */
+  --color-backdrop:       0, 0, 0;
+
+  /* Shadows — slightly more opaque for dark backgrounds */
+  --shadow-xs: 0px 0px 1px rgba(0,0,0,0.64), 0px 0px 2px rgba(0,0,0,0.24), 0px 1px 3px rgba(0,0,0,0.24);
+  --shadow-sm: 0px 0px 1px rgba(0,0,0,0.64), 0px 0px 3px rgba(0,0,0,0.28), 0px 1px 4px rgba(0,0,0,0.28);
+  --shadow-md: 0px 0px 1px rgba(0,0,0,0.48), 0px 0px 2px rgba(0,0,0,0.24), 0px 2px 4px rgba(0,0,0,0.24);
+}
+
+/* =============================================================
+ * Semantic Utility Classes
+ * ============================================================= */
+
+@layer utilities {
+  /* Surfaces */
+  .bg-surface       { background-color: rgb(var(--color-surface)); }
+  .bg-surface-page  { background-color: rgb(var(--color-surface-page)); }
+  .bg-surface-raised{ background-color: rgb(var(--color-surface-raised)); }
+  .bg-surface-inset { background-color: rgb(var(--color-surface-inset)); }
+
+  /* Text */
+  .text-primary     { color: rgb(var(--color-text-primary)); }
+  .text-secondary   { color: rgb(var(--color-text-secondary)); }
+  .text-body        { color: rgb(var(--color-text-body)); }
+  .text-tertiary    { color: rgb(var(--color-text-tertiary)); }
+  .text-muted       { color: rgb(var(--color-text-muted)); }
+
+  /* Borders */
+  .border-light     { border-color: rgb(var(--color-border-light)); }
+  .border-default   { border-color: rgb(var(--color-border-default)); }
+  .border-strong    { border-color: rgb(var(--color-border-strong)); }
+
+  /* Hover surfaces */
+  .hover\:bg-surface-page:hover  { background-color: rgb(var(--color-surface-page)); }
+  .hover\:bg-surface-raised:hover{ background-color: rgb(var(--color-surface-raised)); }
+
+  /* Shadows (theme-aware) */
+  .shadow-theme-xs { box-shadow: var(--shadow-xs); }
+  .shadow-theme-sm { box-shadow: var(--shadow-sm); }
+  .shadow-theme-md { box-shadow: var(--shadow-md); }
+
+  /* Backdrop with opacity */
+  .bg-backdrop      { background-color: rgba(var(--color-backdrop), 0.5); }
+}
+
+/* Dark mode: form elements (selects, inputs) */
+.dark select,
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="search"] {
+  background-color: rgb(var(--color-surface));
+  color: rgb(var(--color-text-primary));
+  border-color: rgb(var(--color-border-default));
+}
+
+.dark select option {
+  background-color: rgb(var(--color-surface));
+  color: rgb(var(--color-text-primary));
+}

@@ -55,7 +55,7 @@ function TimeUnit({ value, label }) {
       <div className="text-3xl sm:text-4xl font-bold text-blue-blue tabular-nums">
         {String(value).padStart(2, '0')}
       </div>
-      <div className="text-xs sm:text-sm text-gray-gray500 uppercase tracking-wide">
+      <div className="text-xs sm:text-sm text-tertiary uppercase tracking-wide">
         {label}
       </div>
     </div>

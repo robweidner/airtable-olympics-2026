@@ -11,7 +11,7 @@ export const CountrySelect = memo(function CountrySelect({ value, onChange, coun
       value={value || ''}
       onChange={(e) => onChange(e.target.value || null)}
       aria-label={label}
-      className="w-full text-sm border border-gray-gray200 rounded px-2 py-1.5 bg-white text-gray-gray800 focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none transition-colors"
+      className="w-full text-sm border border-default rounded px-2 py-1.5 bg-surface text-primary focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none transition-colors"
     >
       <option value="">— Select —</option>
       {countries.map((c) => (

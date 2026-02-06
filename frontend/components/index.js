@@ -8,3 +8,4 @@ export { EventsBoard } from './EventsBoard';
 export { BuilderSection } from './BuilderSection';
 export { OlympicNewsCard } from './OlympicNewsCard';
 export { ShareBanner } from './ShareBanner';
+export { useTheme, ThemeToggle } from './ThemeToggle';

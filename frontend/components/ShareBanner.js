@@ -20,12 +20,12 @@ export function ShareBanner() {
 
   return (
     <section className="px-4 sm:px-8 pb-2">
-      <div className="max-w-5xl mx-auto bg-gradient-to-r from-blue-blueLight3 to-white rounded-xl border border-blue-blueLight1 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="max-w-5xl mx-auto bg-gradient-to-r from-blue-blueLight3 to-white dark:from-blue-blueDark1/20 dark:to-transparent rounded-xl border border-blue-blueLight1 dark:border-blue-blueDark1/40 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-center sm:text-left">
-          <p className="text-gray-gray800 font-semibold text-base">
+          <p className="text-primary font-semibold text-base">
             Think your friends can beat you?
           </p>
-          <p className="text-gray-gray500 text-sm mt-0.5">
+          <p className="text-tertiary text-sm mt-0.5">
             Share the game and see who really knows the Olympics.
             The more players, the better the leaderboard.
           </p>
@@ -33,7 +33,7 @@ export function ShareBanner() {
         <div className="flex gap-2 shrink-0">
           <button
             onClick={handleCopyLink}
-            className="px-4 py-2 bg-white hover:bg-gray-gray100 text-gray-gray700 text-sm font-medium rounded-lg border border-gray-gray300 transition-colors"
+            className="px-4 py-2 bg-surface hover:bg-surface-raised text-secondary text-sm font-medium rounded-lg border border-strong transition-colors"
           >
             Copy Link
           </button>

@@ -63,7 +63,7 @@ export function Beijing2022Recap() {
   }
 
   return (
-    <section className="py-8 px-4 sm:px-8 bg-gray-gray50">
+    <section className="py-8 px-4 sm:px-8 bg-surface-page">
       <div className="max-w-5xl mx-auto">
         {/* Collapsed Header - Always visible */}
         <div
@@ -80,15 +80,15 @@ export function Beijing2022Recap() {
           aria-expanded={isExpanded}
         >
           <div>
-            <h2 className="text-xl font-display font-semibold text-gray-gray700">
+            <h2 className="text-xl font-display font-semibold text-secondary">
               Beijing 2022 Recap
             </h2>
-            <p className="text-sm text-gray-gray400">
+            <p className="text-sm text-muted">
               See how the last Winter Olympics played out
             </p>
           </div>
           <button
-            className="px-4 py-2 text-blue-blue hover:bg-blue-blueLight3 rounded-lg transition-colors text-sm font-medium"
+            className="px-4 py-2 text-blue-blue hover:bg-blue-blueLight3 dark:hover:bg-blue-blueDark1/20 rounded-lg transition-colors text-sm font-medium"
             onClick={(e) => {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
@@ -114,9 +114,9 @@ export function Beijing2022Recap() {
 
             {/* Medal Table */}
             {topCountries.length > 0 ? (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-gray100 overflow-x-auto">
+              <div className="bg-surface rounded-lg shadow-theme-sm border border-light overflow-x-auto">
                 <table className="w-full text-sm min-w-[400px]">
-                  <thead className="bg-gray-gray50 text-gray-gray600">
+                  <thead className="bg-surface-page text-body">
                     <tr>
                       <th className="px-4 py-3 text-left font-medium w-12">#</th>
                       <th className="px-4 py-3 text-left font-medium">Country</th>
@@ -128,11 +128,11 @@ export function Beijing2022Recap() {
                   </thead>
                   <tbody>
                     {topCountries.map((country, idx) => (
-                      <tr key={country.id} className="border-t border-gray-gray100 hover:bg-gray-gray50">
-                        <td className="px-4 py-3 text-gray-gray400 font-medium">{idx + 1}</td>
-                        <td className="px-4 py-3 font-medium text-gray-gray800">
+                      <tr key={country.id} className="border-t border-light hover:bg-surface-page">
+                        <td className="px-4 py-3 text-muted font-medium">{idx + 1}</td>
+                        <td className="px-4 py-3 font-medium text-primary">
                           {country.name}
-                          <span className="ml-2 text-xs text-gray-gray400">{country.noc}</span>
+                          <span className="ml-2 text-xs text-muted">{country.noc}</span>
                         </td>
                         <td className="px-4 py-3 text-center tabular-nums">{country.gold}</td>
                         <td className="px-4 py-3 text-center tabular-nums">{country.silver}</td>
@@ -144,7 +144,7 @@ export function Beijing2022Recap() {
                 </table>
               </div>
             ) : (
-              <p className="text-center text-gray-gray400 text-sm py-4">
+              <p className="text-center text-muted text-sm py-4">
                 No 2022 medal data available yet. Gold/Silver/Bronze Country fields on Events need to be populated for 2022 events.
               </p>
             )}
@@ -157,10 +157,10 @@ export function Beijing2022Recap() {
 
 function StatCard({ label, value, subtitle }) {
   return (
-    <div className="bg-white rounded-lg p-4 text-center shadow-sm border border-gray-gray100">
+    <div className="bg-surface rounded-lg p-4 text-center shadow-theme-sm border border-light">
       <div className="text-2xl font-bold text-blue-blue">{value}</div>
-      <div className="text-xs text-gray-gray500 uppercase tracking-wide">{label}</div>
-      {subtitle && <div className="text-xs text-gray-gray400 mt-1">{subtitle}</div>}
+      <div className="text-xs text-tertiary uppercase tracking-wide">{label}</div>
+      {subtitle && <div className="text-xs text-muted mt-1">{subtitle}</div>}
     </div>
   );
 }

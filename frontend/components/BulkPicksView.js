@@ -270,21 +270,21 @@ export function BulkPicksView({ player, onClose }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-gray50 flex flex-col">
+    <div className="min-h-screen bg-surface-page flex flex-col">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-gray200 shadow-sm">
+      <div className="sticky top-0 z-10 bg-surface border-b border-default shadow-theme-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="text-gray-gray500 hover:text-gray-gray800 transition-colors text-sm font-medium"
+              className="text-tertiary hover:text-primary transition-colors text-sm font-medium"
             >
               &larr; Back
             </button>
-            <div className="hidden sm:block h-5 w-px bg-gray-gray200" />
+            <div className="hidden sm:block h-5 w-px border-l border-default" />
             <div className="hidden sm:block">
-              <p className="font-semibold text-gray-gray800">{player.name}&apos;s Bracket</p>
-              <p className="text-xs text-gray-gray400">
+              <p className="font-semibold text-primary">{player.name}&apos;s Bracket</p>
+              <p className="text-xs text-muted">
                 {filledCount} / {eventCount} events filled
               </p>
             </div>
@@ -295,8 +295,8 @@ export function BulkPicksView({ player, onClose }) {
             disabled={submitting || submittableCount === 0}
             className={`px-5 py-2 rounded-lg font-semibold text-sm transition-all ${
               submitting || submittableCount === 0
-                ? 'bg-gray-gray200 text-gray-gray400 cursor-not-allowed'
-                : 'bg-blue-blue hover:bg-blue-blueDark1 text-white shadow-sm'
+                ? 'bg-surface-raised text-muted cursor-not-allowed'
+                : 'bg-blue-blue hover:bg-blue-blueDark1 text-white shadow-theme-sm'
             }`}
           >
             {submitting ? 'Submitting...' : `Submit ${submittableCount} Pick${submittableCount !== 1 ? 's' : ''}`}
@@ -305,8 +305,8 @@ export function BulkPicksView({ player, onClose }) {
 
         {/* Mobile player name */}
         <div className="sm:hidden px-4 pb-2">
-          <p className="font-semibold text-gray-gray800 text-sm">{player.name}&apos;s Bracket</p>
-          <p className="text-xs text-gray-gray400">
+          <p className="font-semibold text-primary text-sm">{player.name}&apos;s Bracket</p>
+          <p className="text-xs text-muted">
             {filledCount} / {eventCount} events filled
           </p>
         </div>
@@ -347,7 +347,7 @@ function SportGroup({ sport, events, picks, countries, onUpdatePick }) {
     <div>
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{sport.icon || '🏅'}</span>
-        <h3 className="font-semibold text-gray-gray800 text-lg">{sport.name}</h3>
+        <h3 className="font-semibold text-primary text-lg">{sport.name}</h3>
         <span className="text-xs bg-blue-blueLight2 text-blue-blueDark1 px-2 py-0.5 rounded-full">
           {events.length}
         </span>
@@ -386,13 +386,13 @@ function EventRow({ event, pick, countries, onUpdatePick }) {
   const dateStr = formatEventDate(event.date);
 
   // Color coding: green for complete, amber left-border for partial, default for empty
-  let cardClass = 'bg-white border-gray-gray200';
+  let cardClass = 'bg-surface border-default';
   if (isFinal) {
-    cardClass = 'bg-gray-gray50 border-gray-gray100 opacity-60';
+    cardClass = 'bg-surface-page border-light opacity-60';
   } else if (isComplete) {
-    cardClass = 'bg-green-greenLight3 border-green-greenLight1';
+    cardClass = 'bg-green-greenLight3 dark:bg-green-greenDark1/20 border-green-greenLight1 dark:border-green-greenDark1/40';
   } else if (isPartial) {
-    cardClass = 'bg-white border-l-4 border-l-yellow-yellow border-gray-gray200';
+    cardClass = 'bg-surface border-l-4 border-l-yellow-yellow border-default';
   }
 
   return (
@@ -402,13 +402,13 @@ function EventRow({ event, pick, countries, onUpdatePick }) {
           {!isFinal && isComplete && (
             <span className="text-green-green flex-shrink-0" title="All picks locked in">&#10003;</span>
           )}
-          <p className={`font-medium text-sm truncate ${isFinal ? 'text-gray-gray400' : 'text-gray-gray800'}`}>
+          <p className={`font-medium text-sm truncate ${isFinal ? 'text-muted' : 'text-primary'}`}>
             {event.name}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0 ml-2">
           {dateStr && (
-            <span className="text-xs text-gray-gray400">{dateStr}</span>
+            <span className="text-xs text-muted">{dateStr}</span>
           )}
           {isFinal && (
             <span className="text-xs bg-green-greenLight3 text-green-greenDark1 px-2 py-0.5 rounded-full">
@@ -421,7 +421,7 @@ function EventRow({ event, pick, countries, onUpdatePick }) {
       {/* Country selectors — 3-column on desktop, stacked on mobile */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         <div>
-          <label className="text-xs text-gray-gray500 mb-0.5 flex items-center gap-1">
+          <label className="text-xs text-tertiary mb-0.5 flex items-center gap-1">
             <span className="inline-block w-2 h-2 rounded-full bg-yellow-yellow" />
             Gold
           </label>
@@ -437,7 +437,7 @@ function EventRow({ event, pick, countries, onUpdatePick }) {
           )}
         </div>
         <div>
-          <label className="text-xs text-gray-gray500 mb-0.5 flex items-center gap-1">
+          <label className="text-xs text-tertiary mb-0.5 flex items-center gap-1">
             <span className="inline-block w-2 h-2 rounded-full bg-gray-gray300" />
             Silver
           </label>
@@ -453,7 +453,7 @@ function EventRow({ event, pick, countries, onUpdatePick }) {
           )}
         </div>
         <div>
-          <label className="text-xs text-gray-gray500 mb-0.5 flex items-center gap-1">
+          <label className="text-xs text-tertiary mb-0.5 flex items-center gap-1">
             <span className="inline-block w-2 h-2 rounded-full bg-orange-orange" />
             Bronze
           </label>
@@ -479,7 +479,7 @@ function FrozenValue({ countries, countryId }) {
     ? countries.find((c) => c.id === countryId)?.name || '—'
     : '—';
   return (
-    <p className="text-sm text-gray-gray400 px-2 py-1.5 border border-gray-gray100 rounded bg-gray-gray50">
+    <p className="text-sm text-muted px-2 py-1.5 border border-light rounded bg-surface-page">
       {name}
     </p>
   );

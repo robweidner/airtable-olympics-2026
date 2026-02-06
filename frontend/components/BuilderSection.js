@@ -23,23 +23,23 @@ export function BuilderSection() {
   return (
     <section
       id="builder-section"
-      className="bg-gradient-to-b from-gray-gray50 to-white py-16 px-4 sm:px-8"
+      className="bg-gradient-to-b from-surface-page to-surface py-16 px-4 sm:px-8"
     >
       <div className="max-w-4xl mx-auto">
         {/* Section Header */}
-        <h2 className="text-3xl font-display font-bold text-gray-gray800 text-center mb-3">
+        <h2 className="text-3xl font-display font-bold text-primary text-center mb-3">
           Build Something Amazing
         </h2>
 
         {/* Narrative Intro */}
         <div className="max-w-2xl mx-auto text-center mb-10">
-          <p className="text-gray-gray600 mb-4 leading-relaxed">
+          <p className="text-body mb-4 leading-relaxed">
             This isn&apos;t a static dataset. Every 15 minutes, Airtable&apos;s
             built-in sync pulls fresh results from our live base &mdash; medal
             counts, event statuses, athlete performances. You sync it once,
             and it stays current throughout the entire Olympics.
           </p>
-          <p className="text-gray-gray500 leading-relaxed">
+          <p className="text-tertiary leading-relaxed">
             We built this game in 48 hours to prove a point: Airtable isn&apos;t
             just for spreadsheets. It&apos;s infrastructure you can build real
             applications on. And we&apos;re opening up the data for anyone to
@@ -50,9 +50,9 @@ export function BuilderSection() {
         {/* How Sync Works — 3-step visual explainer */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-12 px-4">
           <SyncStep number="1" text="Click a sync link to add a table to your base" />
-          <div className="hidden sm:block text-gray-gray300 text-xl">{'\u2192'}</div>
+          <div className="hidden sm:block text-muted text-xl">{'\u2192'}</div>
           <SyncStep number="2" text="Airtable syncs automatically every 15 minutes" />
-          <div className="hidden sm:block text-gray-gray300 text-xl">{'\u2192'}</div>
+          <div className="hidden sm:block text-muted text-xl">{'\u2192'}</div>
           <SyncStep number="3" text="Build whatever you want on top of live data" />
         </div>
 
@@ -92,7 +92,7 @@ export function BuilderSection() {
             ]}
           >
             <div className="space-y-2.5 mt-auto">
-              <p className="text-xs text-gray-gray500 font-medium uppercase tracking-wide">
+              <p className="text-xs text-tertiary font-medium uppercase tracking-wide">
                 Build ideas
               </p>
               <BuildIdea text="Slack alerts when your country medals" />
@@ -123,7 +123,7 @@ export function BuilderSection() {
               >
                 View on GitHub {'\u2192'}
               </a>
-              <p className="text-xs text-gray-gray400 text-center leading-relaxed">
+              <p className="text-xs text-muted text-center leading-relaxed">
                 Built with Airtable + Claude Code. We used AI to accelerate
                 development, and the source is open so you can see exactly how.
               </p>
@@ -132,16 +132,16 @@ export function BuilderSection() {
         </div>
 
         {/* Community Spotlight Teaser */}
-        <div className="bg-white rounded-xl border border-gray-gray200 p-8 text-center">
-          <h3 className="text-lg font-semibold text-gray-gray800 mb-2">
+        <div className="bg-surface rounded-xl border border-default p-8 text-center">
+          <h3 className="text-lg font-semibold text-primary mb-2">
             Coming Soon: Community Spotlight
           </h3>
-          <p className="text-gray-gray500 max-w-lg mx-auto mb-4 leading-relaxed">
+          <p className="text-tertiary max-w-lg mx-auto mb-4 leading-relaxed">
             As the Olympics unfold over the next two weeks, we&apos;ll feature
             builders doing amazing things with this data. Interviews,
             walkthroughs, and showcases &mdash; updated throughout the Games.
           </p>
-          <p className="text-sm text-gray-gray400">
+          <p className="text-sm text-muted">
             Built something? We want to see it.{' '}
             <a
               href="mailto:rob@airtable.com?subject=Fantasy Olympics Build Submission"
@@ -171,26 +171,26 @@ function SyncModal({ onClose }) {
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-gray-gray900 opacity-50" />
+      <div className="absolute inset-0 bg-backdrop" />
 
       {/* Modal content */}
       <div
-        className="relative bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto"
+        className="relative bg-surface rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-gray100 px-6 py-4 rounded-t-xl flex items-center justify-between">
+        <div className="sticky top-0 bg-surface border-b border-light px-6 py-4 rounded-t-xl flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-gray800">
+            <h3 className="text-lg font-semibold text-primary">
               Sync Live Olympic Data
             </h3>
-            <p className="text-sm text-gray-gray500">
+            <p className="text-sm text-tertiary">
               Click any table to add it to your base
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-gray100 text-gray-gray500 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-raised text-tertiary transition-colors"
           >
             {'\u2715'}
           </button>
@@ -220,8 +220,8 @@ function SyncModal({ onClose }) {
         </div>
 
         {/* Footer hint */}
-        <div className="border-t border-gray-gray100 px-6 py-4 text-center">
-          <p className="text-xs text-gray-gray400">
+        <div className="border-t border-light px-6 py-4 text-center">
+          <p className="text-xs text-muted">
             Each link opens Airtable&apos;s sync setup. Data refreshes automatically every 15 minutes.
           </p>
         </div>
@@ -239,7 +239,7 @@ function SyncStep({ number, text }) {
       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-blueLight2 text-blue-blue font-bold text-sm flex items-center justify-center">
         {number}
       </div>
-      <p className="text-sm text-gray-gray600">{text}</p>
+      <p className="text-sm text-body">{text}</p>
     </div>
   );
 }
@@ -249,7 +249,7 @@ function SyncStep({ number, text }) {
  */
 function BuildIdea({ text }) {
   return (
-    <div className="flex items-center gap-2 text-sm text-gray-gray600">
+    <div className="flex items-center gap-2 text-sm text-body">
       <span className="text-blue-blue">{'\u2022'}</span>
       {text}
     </div>
@@ -279,19 +279,19 @@ function TierCard({ tier, title, description, color, features, children }) {
 
   return (
     <div
-      className={`bg-white rounded-lg border-2 ${styles.border} p-6 flex flex-col`}
+      className={`bg-surface rounded-lg border-2 ${styles.border} p-6 flex flex-col`}
     >
       <span
         className={`inline-block self-start text-xs font-semibold px-2 py-1 rounded-full ${styles.badge} mb-3`}
       >
         {tier}
       </span>
-      <h3 className="text-xl font-semibold text-gray-gray800 mb-2">{title}</h3>
-      <p className="text-sm text-gray-gray500 mb-4">{description}</p>
+      <h3 className="text-xl font-semibold text-primary mb-2">{title}</h3>
+      <p className="text-sm text-tertiary mb-4">{description}</p>
 
       <ul className="space-y-2 mb-6">
         {features.map((feature, idx) => (
-          <li key={idx} className="flex items-center gap-2 text-sm text-gray-gray600">
+          <li key={idx} className="flex items-center gap-2 text-sm text-body">
             <span className="text-green-green">{'\u2713'}</span>
             {feature}
           </li>

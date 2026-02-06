@@ -35,10 +35,10 @@ export function LeaderboardCard() {
   // Handle missing table gracefully
   if (!playersTable) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-gray700">Leaderboard</h2>
-        <p className="text-sm text-gray-gray400 mb-4">See how your picks stack up</p>
-        <p className="text-gray-gray400 text-sm">
+      <div className="bg-surface rounded-lg shadow-theme-md p-6">
+        <h2 className="text-xl font-semibold text-secondary">Leaderboard</h2>
+        <p className="text-sm text-muted mb-4">See how your picks stack up</p>
+        <p className="text-muted text-sm">
           Players table not found. Make sure your base has a &quot;Players&quot; table.
         </p>
       </div>
@@ -48,10 +48,10 @@ export function LeaderboardCard() {
   // Handle empty state
   if (topPlayers.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold text-gray-gray700">Leaderboard</h2>
-        <p className="text-sm text-gray-gray400 mb-4">See how your picks stack up</p>
-        <p className="text-gray-gray400 text-sm">
+      <div className="bg-surface rounded-lg shadow-theme-md p-6">
+        <h2 className="text-xl font-semibold text-secondary">Leaderboard</h2>
+        <p className="text-sm text-muted mb-4">See how your picks stack up</p>
+        <p className="text-muted text-sm">
           No players yet. Be the first to join!
         </p>
       </div>
@@ -59,9 +59,9 @@ export function LeaderboardCard() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold text-gray-gray700">Leaderboard</h2>
-      <p className="text-sm text-gray-gray400 mb-4">See how your picks stack up</p>
+    <div className="bg-surface rounded-lg shadow-theme-md p-6">
+      <h2 className="text-xl font-semibold text-secondary">Leaderboard</h2>
+      <p className="text-sm text-muted mb-4">See how your picks stack up</p>
 
       <div className="space-y-2">
         {topPlayers.map((player, index) => (
@@ -70,24 +70,24 @@ export function LeaderboardCard() {
             onClick={() => setSelectedPlayer(player)}
             className={`flex items-center justify-between py-3 px-3 rounded-md cursor-pointer transition-colors ${
               index === 0
-                ? 'bg-yellow-yellowLight3 border border-yellow-yellowLight1 hover:bg-yellow-yellowLight2'
+                ? 'bg-yellow-yellowLight3 border border-yellow-yellowLight1 hover:bg-yellow-yellowLight2 dark:bg-yellow-yellowDark1/20 dark:border-yellow-yellowDark1/40 dark:hover:bg-yellow-yellowDark1/30'
                 : index === 1
-                  ? 'bg-gray-gray50 border border-gray-gray200 hover:bg-gray-gray100'
+                  ? 'bg-surface-page border border-default hover:bg-surface-raised'
                   : index === 2
-                    ? 'bg-orange-orangeLight3 border border-orange-orangeLight2 hover:bg-orange-orangeLight2'
-                    : 'border-b border-gray-gray100 hover:bg-gray-gray50'
+                    ? 'bg-orange-orangeLight3 border border-orange-orangeLight2 hover:bg-orange-orangeLight2 dark:bg-orange-orangeDark1/20 dark:border-orange-orangeDark1/40 dark:hover:bg-orange-orangeDark1/30'
+                    : 'border-b border-light hover:bg-surface-page'
             }`}
           >
             <div className="flex items-center gap-3">
               <RankBadge rank={index + 1} />
-              <span className="font-medium text-gray-gray800">{player.name}</span>
+              <span className="font-medium text-primary">{player.name}</span>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="font-bold text-lg text-blue-blue">
                 {player.totalScore}
               </span>
-              <span className="text-xs text-gray-gray400">pts</span>
+              <span className="text-xs text-muted">pts</span>
             </div>
           </div>
         ))}
@@ -126,7 +126,7 @@ function RankBadge({ rank }) {
     );
   }
   return (
-    <span className="w-8 h-8 flex items-center justify-center text-gray-gray500 font-medium text-sm">
+    <span className="w-8 h-8 flex items-center justify-center text-tertiary font-medium text-sm">
       {rank}
     </span>
   );

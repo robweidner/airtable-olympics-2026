@@ -66,12 +66,12 @@ export function EventsBoard({ onMakeMyPicks }) {
 
   if (!sportsTable || !eventsTable) {
     return (
-      <section className="py-12 px-4 sm:px-8 bg-white">
+      <section className="py-12 px-4 sm:px-8 bg-surface">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-2xl font-display font-bold text-gray-gray800 mb-4">
+          <h2 className="text-2xl font-display font-bold text-primary mb-4">
             Medal Events
           </h2>
-          <p className="text-gray-gray400">
+          <p className="text-muted">
             Events and Sports tables not available. Add them to the interface settings.
           </p>
         </div>
@@ -82,17 +82,17 @@ export function EventsBoard({ onMakeMyPicks }) {
   const totalEvents = Object.values(eventsBySport).reduce((sum, arr) => sum + arr.length, 0);
 
   return (
-    <section id="events-section" className="py-12 px-4 sm:px-8 bg-white">
+    <section id="events-section" className="py-12 px-4 sm:px-8 bg-surface">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-2xl font-display font-bold text-gray-gray800 text-center mb-2">
+        <h2 className="text-2xl font-display font-bold text-primary text-center mb-2">
           {totalEvents} Medal Events
         </h2>
-        <p className="text-center text-gray-gray500 mb-6">
+        <p className="text-center text-tertiary mb-6">
           Milano-Cortina 2026 — Pick your podium predictions across {sports.length} sports
         </p>
 
         {/* Status legend */}
-        <div className="flex items-center justify-center gap-4 mb-6 text-xs text-gray-gray500">
+        <div className="flex items-center justify-center gap-4 mb-6 text-xs text-tertiary">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-gray-gray300" />
             Upcoming
@@ -132,8 +132,8 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
     <div
       className={`rounded-lg p-4 border transition-all duration-200 cursor-pointer ${
         isExpanded
-          ? 'bg-white border-blue-blue shadow-md col-span-full'
-          : 'bg-gray-gray50 border-gray-gray100 hover:border-blue-blueLight1 hover:shadow-sm'
+          ? 'bg-surface border-blue-blue shadow-theme-md col-span-full'
+          : 'bg-surface-page border-light hover:border-blue-blueLight1 hover:shadow-theme-sm'
       }`}
       onClick={onToggle}
       role="button"
@@ -146,11 +146,11 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">{sport.icon || '🏅'}</span>
-        <h3 className="font-semibold text-gray-gray800 truncate">{sport.name}</h3>
+        <h3 className="font-semibold text-primary truncate">{sport.name}</h3>
         <span className="ml-auto text-xs bg-blue-blueLight2 text-blue-blueDark1 px-2 py-0.5 rounded-full flex-shrink-0">
           {events.length}
         </span>
-        <span className={`text-xs transition-transform duration-200 ${isExpanded ? 'text-blue-blue' : 'text-gray-gray400'}`}>
+        <span className={`text-xs transition-transform duration-200 ${isExpanded ? 'text-blue-blue' : 'text-muted'}`}>
           {isExpanded ? '▲' : '▼'}
         </span>
       </div>
@@ -159,12 +159,12 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
       <ul className={`space-y-1 text-sm ${isExpanded ? 'columns-1 sm:columns-2 lg:columns-3 gap-x-6' : ''}`}>
         {displayEvents.map(event => (
           <li key={event.id} className="break-inside-avoid">
-            <div className="flex items-center gap-2 text-gray-gray600">
+            <div className="flex items-center gap-2 text-body">
               <StatusDot status={event.status} />
               <span className={isExpanded ? '' : 'truncate'}>{event.name}</span>
             </div>
             {isExpanded && event.goldCountry && (
-              <div className="ml-4 mt-0.5 mb-1 text-xs text-gray-gray500 flex flex-wrap gap-x-3">
+              <div className="ml-4 mt-0.5 mb-1 text-xs text-tertiary flex flex-wrap gap-x-3">
                 <span>🥇 {event.goldCountry}</span>
                 {event.silverCountry && <span>🥈 {event.silverCountry}</span>}
                 {event.bronzeCountry && <span>🥉 {event.bronzeCountry}</span>}
@@ -183,7 +183,7 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
 
       {/* Expanded: CTA */}
       {isExpanded && onMakeMyPicks && (
-        <div className="mt-4 pt-3 border-t border-gray-gray100">
+        <div className="mt-4 pt-3 border-t border-light">
           <button
             onClick={(e) => { e.stopPropagation(); onMakeMyPicks(); }}
             className="w-full py-2 bg-blue-blue text-white text-sm font-medium rounded-md hover:bg-blue-blueDark1 transition-colors"

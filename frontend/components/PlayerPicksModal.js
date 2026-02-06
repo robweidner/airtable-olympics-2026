@@ -51,27 +51,27 @@ export function PlayerPicksModal({ player, onClose }) {
   return (
     // Backdrop
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-backdrop flex items-center justify-center z-50"
       onClick={onClose}
     >
       {/* Modal card — stop click propagation so clicking inside doesn't close */}
       <div
-        className="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col"
+        className="bg-surface rounded-lg shadow-lg w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-gray100">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-light">
           <div>
-            <h2 className="text-xl font-semibold text-gray-gray800">
+            <h2 className="text-xl font-semibold text-primary">
               {player.name}&apos;s Picks
             </h2>
-            <p className="text-sm text-gray-gray400 mt-1">
+            <p className="text-sm text-muted mt-1">
               {playerPicks.length} pick{playerPicks.length !== 1 ? 's' : ''} &middot; {totalPoints} pts total
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-gray100 text-gray-gray500 transition-colors text-lg"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-raised text-tertiary transition-colors text-lg"
           >
             &times;
           </button>
@@ -80,7 +80,7 @@ export function PlayerPicksModal({ player, onClose }) {
         {/* Picks list */}
         <div className="overflow-y-auto flex-1 px-6 py-4">
           {playerPicks.length === 0 ? (
-            <p className="text-gray-gray400 text-sm text-center py-8">
+            <p className="text-muted text-sm text-center py-8">
               No picks submitted yet.
             </p>
           ) : (
@@ -88,13 +88,13 @@ export function PlayerPicksModal({ player, onClose }) {
               {playerPicks.map((pick) => (
                 <div
                   key={pick.id}
-                  className="flex items-center justify-between py-2 px-3 rounded-md border border-gray-gray100 hover:bg-gray-gray50"
+                  className="flex items-center justify-between py-2 px-3 rounded-md border border-light hover:bg-surface-page"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-gray800 text-sm truncate">
+                    <p className="font-medium text-primary text-sm truncate">
                       {pick.event}
                     </p>
-                    <div className="flex gap-3 mt-1 text-xs text-gray-gray500">
+                    <div className="flex gap-3 mt-1 text-xs text-tertiary">
                       <span title="Gold pick">
                         <span className="inline-block w-2 h-2 rounded-full bg-yellow-yellow mr-1" style={{verticalAlign: 'middle'}} />
                         {pick.gold || '—'}
