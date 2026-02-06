@@ -174,16 +174,22 @@ frontend/
 
 ---
 
-## How This Was Built
+## How this was built
 
-This project was built in ~48 hours as an exploration of Airtable as application infrastructure, using [Claude Code](https://claude.ai/code) for AI-assisted development. The entire stack — data, logic, UI, automations, and AI — runs on Airtable.
+This is the first custom Airtable Interface Extension I've built. The data model, automations, scoring pipeline, and a 2,700-line React interface came together over a weekend using two AI tools working at different layers.
+
+**Airtable AI** powers the data side. Three Deep Match fields search the web every 15 minutes for medal results and link them to the correct country record automatically. An AI text field with web search generates a daily Olympic news feed. Scoring is pure formulas and rollups that update the moment results land. No scripts, no external APIs. It matched every result correctly in testing, though I'll be watching it closely during the actual Games.
+
+**[Claude Code](https://claude.ai/code)** built the interface. Every component, style, and SDK call was pair-programmed with Claude Code. I'd never built a custom extension before. The 13 components, live countdown, bulk picks editor, dark mode, leaderboard, and events board all came out of that one sprint.
+
+Airtable handles data, logic, and AI at the platform layer. Claude Code handles UI at the code layer. Between the two, I didn't need a team.
 
 **Key design decisions:**
-- **Picks-based game** over draft-based (simpler, more accessible, no coordination needed)
-- **Country predictions** over athlete predictions (116 events x 3 picks = manageable; athlete-level would be overwhelming)
-- **Deep Match for live results** over script-based web scraping (100% accuracy in testing, zero maintenance)
-- **Client-side medal computation** over rollup fields (workaround for UI conversion issues with Airtable rollups)
-- **Public interface** with no login barrier (Airtable handles auth for builders; forms handle it for players)
+- Picks-based game over draft-based (simpler, more accessible, no coordination needed)
+- Country predictions over athlete predictions (116 events x 3 picks = manageable; athlete-level would be overwhelming)
+- Deep Match for live results over script-based web scraping (zero maintenance)
+- Client-side medal computation over rollup fields (workaround for UI conversion issues with Airtable rollups)
+- Public interface with no login barrier (Airtable handles auth for builders; forms handle it for players)
 
 ---
 
