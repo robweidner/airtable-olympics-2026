@@ -1,83 +1,13 @@
 /**
  * PicksChoiceModal - "Make My Picks" entry point.
- *
- * Three flows:
- * 1. Collaborator (currentPlayer from session) → skip to pick methods
- * 2. Returning player (email + PIN match) → "Update Your Picks" + picks form
- * 3. New player (email not found) → "Create New Picks" + registration form
- *
- * Uses Airtable Forms for registration since non-collaborators can't
- * write via the SDK.
+ * Simple modal that opens the picks form in a new tab.
  */
-import { useMemo, useState } from 'react';
-import { FIELD_IDS, PICKS_FORM_URL, REGISTRATION_FORM_URL } from '../constants';
-import { getStringField, getNumberField } from '../helpers';
+import { PICKS_FORM_URL } from '../constants';
 
-export function PicksChoiceModal({ currentPlayer, playerRecords, onClose }) {
-  const [emailInput, setEmailInput] = useState('');
-  const [pinInput, setPinInput] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  // Three-state match: { status: 'match', player } | { status: 'wrong_pin' } | { status: 'new_user' } | null
-  const matchResult = useMemo(() => {
-    if (!submitted || !playerRecords) return null;
-    const email = emailInput.toLowerCase().trim();
-    const pin = pinInput.trim();
-    if (!email || !pin) return null;
-
-    let emailExists = false;
-
-    for (const r of playerRecords) {
-      const pEmail = getStringField(r, FIELD_IDS.PLAYERS.EMAIL).toLowerCase().trim();
-      if (pEmail !== email) continue;
-
-      emailExists = true;
-      const pPin = String(getNumberField(r, FIELD_IDS.PLAYERS.PIN));
-      if (pPin === pin) {
-        return {
-          status: 'match',
-          player: {
-            id: r.id,
-            displayName: getStringField(r, FIELD_IDS.PLAYERS.DISPLAY_NAME)
-              || getStringField(r, FIELD_IDS.PLAYERS.NAME),
-          },
-        };
-      }
-    }
-
-    return emailExists ? { status: 'wrong_pin' } : { status: 'new_user' };
-  }, [submitted, emailInput, pinInput, playerRecords]);
-
-  // Resolved player: collaborator match takes priority, then email+PIN match
-  const resolvedPlayer = currentPlayer
-    || (matchResult?.status === 'match' ? matchResult.player : null);
-
-  // Dynamic title
-  const title = resolvedPlayer
-    ? 'Update Your Picks'
-    : (matchResult?.status === 'new_user' ? 'Create New Picks' : 'Make My Picks');
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    setSubmitted(true);
-  }
-
-  function resetForm() {
-    setSubmitted(false);
-    setEmailInput('');
-    setPinInput('');
-  }
-
-  function handleOneByOne() {
-    if (!resolvedPlayer) return;
-    const url = `${PICKS_FORM_URL}?prefill_Player=${resolvedPlayer.id}&hide_Player=true`;
-    window.open(url, '_blank');
+export function PicksChoiceModal({ onClose }) {
+  function handleOpenForm() {
+    window.open(PICKS_FORM_URL, '_blank');
     onClose();
-  }
-
-  function handleRegister() {
-    const url = `${REGISTRATION_FORM_URL}?prefill_Email=${encodeURIComponent(emailInput.trim())}&prefill_PIN=${encodeURIComponent(pinInput.trim())}`;
-    window.open(url, '_blank');
   }
 
   return (
@@ -91,7 +21,7 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose }) {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-light">
-          <h2 className="text-xl font-semibold text-primary">{title}</h2>
+          <h2 className="text-xl font-semibold text-primary">Make My Picks</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-raised text-tertiary transition-colors text-lg"
@@ -100,148 +30,18 @@ export function PicksChoiceModal({ currentPlayer, playerRecords, onClose }) {
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-5">
-          {resolvedPlayer ? (
-            <>
-              {/* Greeting */}
-              <div className="flex items-center gap-3 p-3 bg-green-greenLight3 dark:bg-green-greenDark1/20 rounded-lg border border-green-greenLight1 dark:border-green-greenDark1/40">
-                <span className="text-lg">👋</span>
-                <div>
-                  <p className="font-medium text-primary">
-                    {currentPlayer
-                      ? `Hey, ${resolvedPlayer.displayName}!`
-                      : `Welcome back, ${resolvedPlayer.displayName}!`}
-                  </p>
-                  <p className="text-xs text-tertiary">
-                    {currentPlayer ? 'Matched by your Airtable account' : (
-                      <>
-                        Matched by email &middot;{' '}
-                        <button
-                          onClick={resetForm}
-                          className="text-blue-blue hover:text-blue-blueDark1"
-                        >
-                          Not you?
-                        </button>
-                      </>
-                    )}
-                  </p>
-                </div>
-              </div>
-
-              {/* Pick CTA */}
-              <div className="space-y-3">
-                <button
-                  onClick={handleOneByOne}
-                  className="w-full py-2.5 px-4 bg-blue-blue hover:bg-blue-blueDark1 text-white font-medium text-sm rounded-lg transition-colors"
-                >
-                  Open Picks Form
-                </button>
-                <p className="text-xs text-center text-muted">
-                  Select your picks, explore the data we&apos;ve provided, and stay tuned for what&apos;s to come.
-                </p>
-              </div>
-            </>
-          ) : matchResult?.status === 'new_user' ? (
-            <>
-              {/* New user — registration prompt */}
-              <div className="text-center py-1">
-                <span className="text-3xl">🏅</span>
-                <h3 className="text-lg font-semibold text-primary mt-2">
-                  Looks like you&apos;re new!
-                </h3>
-                <p className="text-sm text-tertiary mt-1.5 max-w-xs mx-auto">
-                  Register below to start picking. You&apos;ll choose a display name
-                  and your email + PIN will be saved so you can come back anytime.
-                </p>
-              </div>
-
-              <button
-                onClick={handleRegister}
-                className="w-full py-2.5 px-4 bg-green-green hover:bg-green-greenDark1 text-white font-medium text-sm rounded-lg transition-colors"
-              >
-                Register &amp; Start Picking
-              </button>
-
-              <div className="bg-surface-raised rounded-lg p-3">
-                <p className="text-xs text-tertiary leading-relaxed">
-                  After you submit the registration form, come back here and
-                  click &ldquo;Make My Picks&rdquo; again. Your email and PIN
-                  will work right away.
-                </p>
-              </div>
-
-              <button
-                onClick={resetForm}
-                className="w-full text-sm text-blue-blue hover:text-blue-blueDark1 transition-colors"
-              >
-                &larr; Back
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Email + PIN identification */}
-              <div className="text-center py-1">
-                <span className="text-3xl">🏅</span>
-                <h3 className="text-lg font-semibold text-primary mt-2">
-                  Enter your details
-                </h3>
-                <p className="text-sm text-tertiary mt-1.5 max-w-xs mx-auto">
-                  New here? Pick any numeric PIN you&apos;ll remember.
-                  Returning? Use the same email and PIN you registered with.
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={emailInput}
-                    onChange={(e) => { setEmailInput(e.target.value); setSubmitted(false); }}
-                    placeholder="you@example.com"
-                    className="w-full border border-default rounded-lg px-3 py-2 bg-surface text-primary focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none text-sm"
-                    autoFocus
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-secondary mb-1">
-                    PIN
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    value={pinInput}
-                    onChange={(e) => { setPinInput(e.target.value.replace(/\D/g, '')); setSubmitted(false); }}
-                    placeholder="Choose or enter your numeric PIN"
-                    className="w-full border border-default rounded-lg px-3 py-2 bg-surface text-primary focus:border-blue-blue focus:ring-1 focus:ring-blue-blueLight1 outline-none text-sm font-mono tracking-widest"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={!emailInput.trim() || !pinInput.trim()}
-                  className={`w-full px-4 py-2.5 rounded-lg font-medium text-sm transition-colors ${
-                    emailInput.trim() && pinInput.trim()
-                      ? 'bg-blue-blue text-white hover:bg-blue-blueDark1'
-                      : 'bg-surface-raised text-muted cursor-not-allowed'
-                  }`}
-                >
-                  Let&apos;s Go
-                </button>
-                {matchResult?.status === 'wrong_pin' && (
-                  <p className="text-xs text-red-red text-center">
-                    Incorrect PIN. Try again or ask the game organizer for help.
-                  </p>
-                )}
-              </form>
-
-              <p className="text-xs text-center text-muted">
-                It&apos;s a game, not a bank &mdash; the PIN just keeps things fair.
-              </p>
-            </>
-          )}
+        <div className="px-6 py-5 space-y-4">
+          <button
+            onClick={handleOpenForm}
+            className="w-full py-2.5 px-4 bg-blue-blue hover:bg-blue-blueDark1 text-white font-medium text-sm rounded-lg transition-colors"
+          >
+            Open Picks Form
+          </button>
+          <p className="text-xs text-center text-muted">
+            Select your picks, explore the data we&apos;ve provided, and stay
+            tuned &mdash; we&apos;re working on a way to make all your picks at
+            once.
+          </p>
         </div>
       </div>
     </div>

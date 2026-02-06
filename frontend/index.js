@@ -148,8 +148,6 @@ function FantasyOlympicsLanding() {
 
         {showPicksModal && (
           <PicksChoiceModal
-            currentPlayer={currentPlayer}
-            playerRecords={playerRecords}
             onClose={() => setShowPicksModal(false)}
           />
         )}
