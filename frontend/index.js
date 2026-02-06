@@ -76,6 +76,15 @@ function FantasyOlympicsLanding() {
           <p className="mt-2">
             Created by{' '}
             <a
+              href="https://airtable.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-blue hover:text-blue-blueDark1 transition-colors"
+            >
+              Airtable
+            </a>
+            {' '}and{' '}
+            <a
               href="https://robweidner.com"
               target="_blank"
               rel="noopener noreferrer"
