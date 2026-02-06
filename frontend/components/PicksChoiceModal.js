@@ -4,10 +4,13 @@
  * Auto-detects the logged-in Airtable user via useSession().currentUser.email
  * and matches against the Players table Email field. If matched, skips the
  * "Who are you?" step. Falls back to a manual dropdown if no match.
+ *
+ * If the visitor is not logged into Airtable at all, shows an account
+ * creation prompt instead — the full picks experience requires auth.
  */
 import { useBase, useRecords, useSession } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
-import { TABLE_IDS, FIELD_IDS, PICKS_FORM_URL } from '../constants';
+import { TABLE_IDS, FIELD_IDS, PICKS_FORM_URL, INTERFACE_URL } from '../constants';
 import { getStringField } from '../helpers';
 
 const PLAYER_FIELDS = [
@@ -17,9 +20,118 @@ const PLAYER_FIELDS = [
   FIELD_IDS.PLAYERS.REGISTRATION_STATUS,
 ];
 
+const AIRTABLE_SIGNUP_URL = 'https://airtable.com/signup';
+
+function NotLoggedInView({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-gray100">
+          <h2 className="text-xl font-semibold text-gray-gray800">Make My Picks</h2>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-gray100 text-gray-gray500 transition-colors text-lg"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-5">
+          {/* Account pitch */}
+          <div className="text-center">
+            <p className="text-4xl mb-3">🏅</p>
+            <h3 className="text-lg font-semibold text-gray-gray800">
+              Join the game with a free Airtable account
+            </h3>
+            <p className="text-sm text-gray-gray500 mt-2">
+              Create a free account to get the full Fantasy Olympics experience.
+            </p>
+          </div>
+
+          {/* Benefits */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-3 bg-blue-blueLight3 rounded-lg">
+              <span className="text-lg mt-0.5">🗂️</span>
+              <div>
+                <p className="font-medium text-gray-gray800 text-sm">Pick all 116 events at once</p>
+                <p className="text-xs text-gray-gray500">Fill in your entire bracket on one screen</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 bg-blue-blueLight3 rounded-lg">
+              <span className="text-lg mt-0.5">🔄</span>
+              <div>
+                <p className="font-medium text-gray-gray800 text-sm">Update picks throughout the Games</p>
+                <p className="text-xs text-gray-gray500">Change your mind before events start</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-3 bg-blue-blueLight3 rounded-lg">
+              <span className="text-lg mt-0.5">📊</span>
+              <div>
+                <p className="font-medium text-gray-gray800 text-sm">Track your score live</p>
+                <p className="text-xs text-gray-gray500">See how your picks are doing as medals are awarded</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="space-y-3">
+            <a
+              href={AIRTABLE_SIGNUP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center py-3 px-4 bg-blue-blue text-white font-semibold rounded-lg hover:bg-blue-blueDark1 transition-colors"
+            >
+              Create free Airtable account
+            </a>
+            {INTERFACE_URL && (
+              <p className="text-xs text-gray-gray400 text-center">
+                Already have an account?{' '}
+                <a
+                  href={INTERFACE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-blue hover:text-blue-blueDark1"
+                >
+                  Sign in and come back
+                </a>
+              </p>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 border-t border-gray-gray100"></div>
+            <span className="text-xs text-gray-gray400">or pick without an account</span>
+            <div className="flex-1 border-t border-gray-gray100"></div>
+          </div>
+
+          {/* Form fallback */}
+          <a
+            href={PICKS_FORM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3 px-4 border-2 border-gray-gray200 text-gray-gray600 font-medium rounded-lg hover:border-gray-gray300 hover:bg-gray-gray50 transition-colors text-sm"
+          >
+            Use the picks form instead
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function PicksChoiceModal({ onClose, onBulkPicks }) {
   const base = useBase();
   const session = useSession();
+  const isLoggedIn = !!session.currentUser;
+
   const playersTable = base.getTableByIdIfExists(TABLE_IDS.PLAYERS);
   const playerRecords = useRecords(playersTable, { fields: PLAYER_FIELDS });
 
@@ -57,6 +169,11 @@ export function PicksChoiceModal({ onClose, onBulkPicks }) {
     || null;
 
   const isAutoMatched = !!autoMatchedPlayer;
+
+  // Not logged in — show account creation prompt
+  if (!isLoggedIn) {
+    return <NotLoggedInView onClose={onClose} />;
+  }
 
   function handleOneByOne() {
     if (!resolvedPlayer) return;
