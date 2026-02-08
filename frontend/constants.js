@@ -39,9 +39,9 @@ export const FIELD_IDS = {
     GOLD_COUNTRY: 'fldh3upqaAPGFeUZ5',    // Link to Countries
     SILVER_COUNTRY: 'fldZgAPPwZ3jGENIn',   // Link to Countries
     BRONZE_COUNTRY: 'fldxOaYaxe19hI902',   // Link to Countries
-    GOLD_ATHLETE: 'fldCsIFzXJHPOGOX9',    // Link to Athletes
-    SILVER_ATHLETE: 'fldBZmnj57Yfkq4qM',  // Link to Athletes
-    BRONZE_ATHLETE: 'fldl6TYmWzKtvRD5W',  // Link to Athletes
+    GOLD_ATHLETE: 'fldIqYLD0tz9mLn1D',    // Deep Match AI → Athletes
+    SILVER_ATHLETE: 'fldcv8XooY7iePwPT',  // Deep Match AI → Athletes
+    BRONZE_ATHLETE: 'fldZoMKcOrZv16axs',  // Deep Match AI → Athletes
     SPORT_ICON: 'fldfJ2QZqc4yFwOBY',      // Lookup: Icon (from Sport)
     SPORT_NAME: 'fldn28wyUpF3egOUB',       // Lookup: Sport Name (from Sport)
   },
@@ -66,9 +66,9 @@ export const FIELD_IDS = {
     SILVER_MEDALS: 'fldPw3dUKQC5wzSi2',   // Rollup
     BRONZE_MEDALS: 'fldZ7RbqHs4MlRc3a',   // Rollup
     TOTAL_MEDALS: 'fldX3UZgbD487sV6g',    // Rollup
-    GOLD_EVENTS: 'fldTUsH9tWD0DKIWp',     // Rollup: event names
-    SILVER_EVENTS: 'fldoVbImNLITeM4aW',   // Rollup: event names
-    BRONZE_EVENTS: 'fldkCz39pSn4ittC1',   // Rollup: event names
+    GOLD_EVENTS: 'fldZCMUVcNUfv6ooQ',     // Inverse of Events.Gold Athlete AI
+    SILVER_EVENTS: 'fldeXuHe4HDzVw1c4',   // Inverse of Events.Silver Athlete AI
+    BRONZE_EVENTS: 'fldjQq9SqqdUakdJz',   // Inverse of Events.Bronze Athlete AI
   },
   SPORTS: {
     NAME: 'fldE3FUUczhsQ0J0f',            // "Sport Name"

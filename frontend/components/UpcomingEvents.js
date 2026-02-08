@@ -79,12 +79,6 @@ function getDayLabel(dateStr, now) {
   });
 }
 
-function linkedNames(record, fieldId) {
-  const val = record.getCellValue(fieldId);
-  if (!val || !Array.isArray(val) || val.length === 0) return null;
-  return val.map((a) => a.name).join(', ');
-}
-
 /* ─── Main component ─── */
 
 export function UpcomingEvents({ onMakeMyPicks, onPickEvent }) {
@@ -119,9 +113,9 @@ export function UpcomingEvents({ onMakeMyPicks, onPickEvent }) {
         goldCountry: getStringField(r, FIELD_IDS.EVENTS.GOLD_COUNTRY) || null,
         silverCountry: getStringField(r, FIELD_IDS.EVENTS.SILVER_COUNTRY) || null,
         bronzeCountry: getStringField(r, FIELD_IDS.EVENTS.BRONZE_COUNTRY) || null,
-        goldAthlete: linkedNames(r, FIELD_IDS.EVENTS.GOLD_ATHLETE),
-        silverAthlete: linkedNames(r, FIELD_IDS.EVENTS.SILVER_ATHLETE),
-        bronzeAthlete: linkedNames(r, FIELD_IDS.EVENTS.BRONZE_ATHLETE),
+        goldAthlete: getStringField(r, FIELD_IDS.EVENTS.GOLD_ATHLETE) || null,
+        silverAthlete: getStringField(r, FIELD_IDS.EVENTS.SILVER_ATHLETE) || null,
+        bronzeAthlete: getStringField(r, FIELD_IDS.EVENTS.BRONZE_ATHLETE) || null,
       }))
       .filter((e) => e.year === 2026 && e.date)
       .sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -348,45 +342,47 @@ function EventRow({ event, now, isNext, index, onPick }) {
 /* ─── Recent result row ─── */
 
 function ResultRow({ event, index }) {
+  const hasAthletes = event.goldAthlete || event.silverAthlete || event.bronzeAthlete;
+
   return (
     <div
-      className="flex items-center gap-3 py-2.5 px-3 rounded-md hover:bg-surface-raised transition-colors schedule-row-enter group"
+      className="flex items-start gap-3 py-3 px-3 rounded-md hover:bg-surface-raised transition-colors schedule-row-enter"
       style={{ animationDelay: `${index * 60}ms` }}
     >
-      <span className="text-lg flex-shrink-0 w-6 text-center">
+      <span className="text-lg flex-shrink-0 w-6 text-center mt-0.5">
         {event.sportIcon}
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-primary truncate">
-          {event.name}
-        </p>
-        <p className="text-xs text-muted truncate hidden sm:block">
-          {event.sportName}
-        </p>
+        <p className="text-sm font-medium text-primary truncate">{event.name}</p>
+        <p className="text-xs text-muted truncate">{event.sportName}</p>
       </div>
-      <div className="flex-shrink-0 text-xs text-right">
-        <div className="flex items-center gap-2">
-          <span>🥇 {event.goldCountry}</span>
-          {event.silverCountry && (
-            <span className="hidden sm:inline">🥈 {event.silverCountry}</span>
-          )}
-          {event.bronzeCountry && (
-            <span className="hidden sm:inline">🥉 {event.bronzeCountry}</span>
-          )}
-        </div>
-        {/* Athlete names — revealed on hover */}
-        {(event.goldAthlete || event.silverAthlete || event.bronzeAthlete) && (
-          <div className="hidden group-hover:flex items-center gap-2 mt-0.5 text-muted">
-            <span className="truncate max-w-[8rem]">{event.goldAthlete}</span>
-            {event.silverAthlete && (
-              <span className="hidden sm:inline truncate max-w-[8rem]">{event.silverAthlete}</span>
-            )}
-            {event.bronzeAthlete && (
-              <span className="hidden sm:inline truncate max-w-[8rem]">{event.bronzeAthlete}</span>
-            )}
-          </div>
-        )}
+
+      {/* Podium — always visible */}
+      <div className="flex-shrink-0 text-xs space-y-1">
+        <PodiumLine emoji="🥇" country={event.goldCountry} athlete={hasAthletes ? event.goldAthlete : null} />
+        <PodiumLine emoji="🥈" country={event.silverCountry} athlete={hasAthletes ? event.silverAthlete : null} />
+        <PodiumLine emoji="🥉" country={event.bronzeCountry} athlete={hasAthletes ? event.bronzeAthlete : null} />
       </div>
+    </div>
+  );
+}
+
+function shortenAthlete(name) {
+  if (!name) return null;
+  // For team events with many athletes, show first name + count
+  const parts = name.split(', ');
+  if (parts.length <= 2) return name;
+  return `${parts[0]} & ${parts.length - 1} more`;
+}
+
+function PodiumLine({ emoji, country, athlete }) {
+  if (!country) return null;
+  const short = shortenAthlete(athlete);
+  return (
+    <div className="flex items-baseline gap-1.5">
+      <span>{emoji}</span>
+      <span className="font-medium w-8">{country}</span>
+      {short && <span className="text-muted hidden sm:inline">{short}</span>}
     </div>
   );
 }
