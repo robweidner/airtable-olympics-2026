@@ -11,8 +11,8 @@ import { CommunitySpotlight } from './CommunitySpotlight';
 // Base ID used to construct share + embed URLs
 const BASE_ID = 'appoY3nwpfUnUut4P';
 
-// Featured tables — shown with embedded Airtable previews
-const FEATURED_TABLES = [
+// All syncable tables — shown with embedded Airtable previews
+const ALL_TABLES = [
   {
     label: 'Countries',
     detail: '90 nations + medal counts',
@@ -20,10 +20,22 @@ const FEATURED_TABLES = [
     embedSrc: `https://airtable.com/embed/${BASE_ID}/shr632RQw5PdSJgoY?viewControls=on`,
   },
   {
+    label: 'Athletes',
+    detail: '3,600+ competitors with bios',
+    shareToken: 'shraFpEmwrY7LBjh6',
+    embedSrc: `https://airtable.com/embed/${BASE_ID}/shraFpEmwrY7LBjh6?viewControls=on`,
+  },
+  {
     label: 'Events',
-    detail: '116 medal events',
+    detail: '116 medal events with live results',
     shareToken: 'shrAK9nlSAX51L7S2',
     embedSrc: `https://airtable.com/embed/${BASE_ID}/shrAK9nlSAX51L7S2?viewControls=on`,
+  },
+  {
+    label: 'Sports',
+    detail: '16 winter disciplines',
+    shareToken: 'shrJxONmCYd2i3IAM',
+    embedSrc: `https://airtable.com/embed/${BASE_ID}/shrJxONmCYd2i3IAM?viewControls=on`,
   },
   {
     label: 'Olympic News',
@@ -31,14 +43,18 @@ const FEATURED_TABLES = [
     shareToken: 'shrOhkwiRrQhB8zCl',
     embedSrc: `https://airtable.com/embed/${BASE_ID}/shrOhkwiRrQhB8zCl?viewControls=on`,
   },
-];
-
-// Additional tables — listed in the "More Tables" accordion (no embeds)
-const MORE_TABLES = [
-  { label: 'Athletes', detail: '2,470+ competitors', shareToken: 'shraFpEmwrY7LBjh6' },
-  { label: 'Sports', detail: '16 disciplines', shareToken: 'shrJxONmCYd2i3IAM' },
-  { label: 'Players', detail: 'Fantasy leaderboard', shareToken: 'shrEwciwYyPOa8oFc' },
-  { label: 'Picks', detail: 'All predictions', shareToken: 'shrTXGgyVl0FJ77Sa' },
+  {
+    label: 'Players',
+    detail: 'Fantasy leaderboard & scores',
+    shareToken: 'shrEwciwYyPOa8oFc',
+    embedSrc: `https://airtable.com/embed/${BASE_ID}/shrEwciwYyPOa8oFc?viewControls=on`,
+  },
+  {
+    label: 'Picks',
+    detail: 'All player predictions',
+    shareToken: 'shrTXGgyVl0FJ77Sa',
+    embedSrc: `https://airtable.com/embed/${BASE_ID}/shrTXGgyVl0FJ77Sa?viewControls=on`,
+  },
 ];
 
 const GITHUB_REPO = 'https://github.com/robweidner/airtable-olympics-2026';
@@ -83,7 +99,7 @@ export function BuilderSection() {
       id="builder-section"
       className="bg-gradient-to-b from-surface-page to-surface py-16 px-4 sm:px-8"
     >
-      <div className="max-w-4xl mx-auto">
+      <div>
         {/* Section Header */}
         <h2 className="text-3xl font-display font-bold text-primary text-center mb-3">
           Build Something Amazing
@@ -93,7 +109,7 @@ export function BuilderSection() {
         <DataWall stats={stats} />
 
         {/* Narrative Intro — shortened, stats do the heavy lifting */}
-        <p className="max-w-2xl mx-auto text-center text-tertiary leading-relaxed mb-10">
+        <p className="text-center text-tertiary leading-relaxed mb-10">
           Live data from the 2026 Milano Cortina Winter Olympics. Sync any table
           to your base &mdash; results update every 15 minutes as medals are awarded.
         </p>
@@ -239,8 +255,6 @@ function DataWall({ stats }) {
  * tables are tucked into an expandable accordion.
  */
 function SyncModal({ onClose }) {
-  const [showMore, setShowMore] = useState(false);
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -261,7 +275,7 @@ function SyncModal({ onClose }) {
               Explore &amp; Sync Olympic Data
             </h3>
             <p className="text-sm text-tertiary">
-              Preview live data below, then sync it to your base.
+              7 tables of live Olympic data. Preview below, then sync to your base.
             </p>
           </div>
           <button
@@ -272,10 +286,37 @@ function SyncModal({ onClose }) {
           </button>
         </div>
 
-        {/* Featured table cards with embeds */}
         <div className="p-6">
+          {/* Helper text — sync vs copy explanation (upfront) */}
+          <div className="mb-6 bg-blue-blueLight3 border border-blue-blueLight1 rounded-lg p-4">
+            <p className="text-sm text-blue-blueDark1 font-medium mb-1">
+              Synced table vs. copied data
+            </p>
+            <p className="text-xs text-blue-blue leading-relaxed">
+              When you click &ldquo;Sync to My Base&rdquo;, you&apos;ll choose a
+              workspace and base. Then pick:
+            </p>
+            <ul className="mt-2 space-y-1 text-xs text-blue-blue">
+              <li className="flex items-start gap-1.5">
+                <span className="mt-0.5">{'\u2022'}</span>
+                <span>
+                  <strong>Create a synced table</strong> &mdash; stays up-to-date
+                  automatically (refreshes every 15 min)
+                </span>
+              </li>
+              <li className="flex items-start gap-1.5">
+                <span className="mt-0.5">{'\u2022'}</span>
+                <span>
+                  <strong>Copy this data</strong> &mdash; one-time snapshot you can
+                  edit freely
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          {/* All table cards with embeds */}
           <div className="space-y-6">
-            {FEATURED_TABLES.map((table) => (
+            {ALL_TABLES.map((table) => (
               <div
                 key={table.label}
                 className="border border-default rounded-lg overflow-hidden bg-surface"
@@ -309,73 +350,6 @@ function SyncModal({ onClose }) {
             ))}
           </div>
 
-          {/* Helper text — sync vs copy explanation */}
-          <div className="mt-6 bg-blue-blueLight3 border border-blue-blueLight1 rounded-lg p-4">
-            <p className="text-sm text-blue-blueDark1 font-medium mb-1">
-              Synced table vs. copied data
-            </p>
-            <p className="text-xs text-blue-blue leading-relaxed">
-              When you click &ldquo;Sync to My Base&rdquo;, you&apos;ll choose a
-              workspace and base. Then pick:
-            </p>
-            <ul className="mt-2 space-y-1 text-xs text-blue-blue">
-              <li className="flex items-start gap-1.5">
-                <span className="mt-0.5">{'\u2022'}</span>
-                <span>
-                  <strong>Create a synced table</strong> &mdash; stays up-to-date
-                  automatically (refreshes every 15 min)
-                </span>
-              </li>
-              <li className="flex items-start gap-1.5">
-                <span className="mt-0.5">{'\u2022'}</span>
-                <span>
-                  <strong>Copy this data</strong> &mdash; one-time snapshot you can
-                  edit freely
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          {/* More Tables accordion */}
-          <div className="mt-6 border border-default rounded-lg">
-            <button
-              onClick={() => setShowMore((prev) => !prev)}
-              className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-primary hover:bg-surface-raised transition-colors rounded-lg"
-            >
-              <span>More Tables</span>
-              <span className="text-tertiary">
-                {showMore ? '\u25BE' : '\u25B8'}
-              </span>
-            </button>
-
-            {showMore && (
-              <div className="border-t border-light">
-                {MORE_TABLES.map((table) => (
-                  <div
-                    key={table.label}
-                    className="flex items-center justify-between px-4 py-3 border-b border-light last:border-b-0"
-                  >
-                    <div>
-                      <span className="text-sm font-medium text-primary">
-                        {table.label}
-                      </span>
-                      <span className="block text-xs text-tertiary mt-0.5">
-                        {table.detail}
-                      </span>
-                    </div>
-                    <a
-                      href={`https://airtable.com/${BASE_ID}/${table.shareToken}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 py-1.5 px-3 bg-green-green hover:bg-green-greenDark1 text-white text-xs font-medium rounded-md transition-colors whitespace-nowrap"
-                    >
-                      Sync {'\u2192'}
-                    </a>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>
