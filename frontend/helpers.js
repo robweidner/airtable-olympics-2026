@@ -121,9 +121,6 @@ export function mapRecordToEvent(record) {
   const goldLink = record.getCellValue(FIELD_IDS.EVENTS.GOLD_COUNTRY);
   const silverLink = record.getCellValue(FIELD_IDS.EVENTS.SILVER_COUNTRY);
   const bronzeLink = record.getCellValue(FIELD_IDS.EVENTS.BRONZE_COUNTRY);
-  const goldAthletes = record.getCellValue(FIELD_IDS.EVENTS.GOLD_ATHLETE);
-  const silverAthletes = record.getCellValue(FIELD_IDS.EVENTS.SILVER_ATHLETE);
-  const bronzeAthletes = record.getCellValue(FIELD_IDS.EVENTS.BRONZE_ATHLETE);
 
   return {
     id: record.id,
@@ -136,15 +133,10 @@ export function mapRecordToEvent(record) {
     goldCountry: goldLink?.[0]?.name ?? null,
     silverCountry: silverLink?.[0]?.name ?? null,
     bronzeCountry: bronzeLink?.[0]?.name ?? null,
-    goldAthlete: formatAthleteNames(goldAthletes),
-    silverAthlete: formatAthleteNames(silverAthletes),
-    bronzeAthlete: formatAthleteNames(bronzeAthletes),
+    goldAthlete: getStringField(record, FIELD_IDS.EVENTS.GOLD_ATHLETE) || null,
+    silverAthlete: getStringField(record, FIELD_IDS.EVENTS.SILVER_ATHLETE) || null,
+    bronzeAthlete: getStringField(record, FIELD_IDS.EVENTS.BRONZE_ATHLETE) || null,
   };
-}
-
-function formatAthleteNames(athleteLink) {
-  if (!athleteLink || !Array.isArray(athleteLink) || athleteLink.length === 0) return null;
-  return athleteLink.map(a => a.name).join(', ');
 }
 
 /**
