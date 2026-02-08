@@ -38,8 +38,8 @@ export function AthleteLeaderboardCard() {
   const athletesTable = base.getTableByIdIfExists(TABLE_IDS.ATHLETES);
   const [selectedAthleteId, setSelectedAthleteId] = useState(null);
 
-  const eventRecords = useRecords(eventsTable, { fields: EVENT_ATHLETE_FIELDS });
-  const countryRecords = useRecords(countriesTable, { fields: COUNTRY_NAME_FIELDS });
+  const eventRecords = useRecords(eventsTable);
+  const countryRecords = useRecords(countriesTable);
   const athleteRecords = useRecords(athletesTable);
 
   // Build country lookup map

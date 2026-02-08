@@ -21,7 +21,7 @@ export function LeaderboardCard() {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   // Fetch only the fields we need
-  const records = useRecords(playersTable, { fields: PLAYER_FIELDS });
+  const records = useRecords(playersTable);
 
   // Snapshot and sort data to prevent mid-render mutations
   const topPlayers = useMemo(() => {

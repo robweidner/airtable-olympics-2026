@@ -5,7 +5,7 @@
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
-import { getStringField, getNumberField } from '../helpers';
+import { getStringField, getNumberField, getCellValueSafe } from '../helpers';
 
 const NEWS_FIELDS = [
   FIELD_IDS.OLYMPIC_NEWS.HEADLINE,
@@ -29,8 +29,8 @@ const CATEGORY_STYLES = {
 const DEFAULT_STYLE = { bg: 'bg-gray-gray200 dark:bg-gray-gray600', text: 'text-gray-gray700 dark:text-gray-gray200' };
 
 function mapRecordToNewsItem(record) {
-  const statusVal = record.getCellValue(FIELD_IDS.OLYMPIC_NEWS.STATUS);
-  const categoryVal = record.getCellValue(FIELD_IDS.OLYMPIC_NEWS.CATEGORY);
+  const statusVal = getCellValueSafe(record, FIELD_IDS.OLYMPIC_NEWS.STATUS);
+  const categoryVal = getCellValueSafe(record, FIELD_IDS.OLYMPIC_NEWS.CATEGORY);
   const timeSlot = getStringField(record, FIELD_IDS.OLYMPIC_NEWS.PUBLISHED_TIME_SLOT);
 
   return {
@@ -41,7 +41,7 @@ function mapRecordToNewsItem(record) {
     timeSlot,
     status: statusVal?.name ?? 'Draft',
     dayNumber: getNumberField(record, FIELD_IDS.OLYMPIC_NEWS.DAY_NUMBER),
-    created: record.getCellValue(FIELD_IDS.OLYMPIC_NEWS.CREATED),
+    created: getCellValueSafe(record, FIELD_IDS.OLYMPIC_NEWS.CREATED),
   };
 }
 
@@ -67,7 +67,7 @@ export function OlympicNewsCard() {
   const [showAll, setShowAll] = useState(false);
   const base = useBase();
   const newsTable = base.getTableByIdIfExists(TABLE_IDS.OLYMPIC_NEWS);
-  const newsRecords = useRecords(newsTable, { fields: NEWS_FIELDS });
+  const newsRecords = useRecords(newsTable);
 
   const newsItems = useMemo(() => {
     if (!newsRecords) return [];

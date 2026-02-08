@@ -8,12 +8,11 @@
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useState, useEffect, useMemo } from 'react';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
-import { getStringField, getNumberField } from '../helpers';
+import { getStringField, getNumberField, computeEventStatus, getCellValueSafe } from '../helpers';
 
 const SCHEDULE_FIELDS = [
   FIELD_IDS.EVENTS.NAME,
   FIELD_IDS.EVENTS.DATE,
-  FIELD_IDS.EVENTS.STATUS,
   FIELD_IDS.EVENTS.VENUE,
   FIELD_IDS.EVENTS.YEAR,
   FIELD_IDS.EVENTS.SPORT_ICON,
@@ -84,7 +83,7 @@ function getDayLabel(dateStr, now) {
 export function UpcomingEvents({ onMakeMyPicks, onPickEvent }) {
   const base = useBase();
   const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
-  const records = useRecords(eventsTable, { fields: SCHEDULE_FIELDS });
+  const records = useRecords(eventsTable);
 
   const [now, setNow] = useState(() => new Date());
 
@@ -104,8 +103,8 @@ export function UpcomingEvents({ onMakeMyPicks, onPickEvent }) {
       .map((r) => ({
         id: r.id,
         name: getStringField(r, FIELD_IDS.EVENTS.NAME),
-        date: r.getCellValue(FIELD_IDS.EVENTS.DATE),
-        status: r.getCellValue(FIELD_IDS.EVENTS.STATUS) || 'Upcoming',
+        date: getCellValueSafe(r, FIELD_IDS.EVENTS.DATE),
+        status: computeEventStatus(getCellValueSafe(r, FIELD_IDS.EVENTS.DATE), getStringField(r, FIELD_IDS.EVENTS.GOLD_COUNTRY)),
         venue: getStringField(r, FIELD_IDS.EVENTS.VENUE),
         year: getNumberField(r, FIELD_IDS.EVENTS.YEAR),
         sportIcon: getStringField(r, FIELD_IDS.EVENTS.SPORT_ICON) || '🏅',

@@ -6,7 +6,7 @@
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS, COMMUNITY_BUILDS_FORM_URL } from '../constants';
-import { getStringField, getNumberField } from '../helpers';
+import { getStringField, getNumberField, getCellValueSafe } from '../helpers';
 
 const CB = FIELD_IDS.COMMUNITY_BUILDS;
 
@@ -33,9 +33,9 @@ const CATEGORY_STYLES = {
 };
 
 function mapRecordToBuild(record) {
-  const categoryVal = record.getCellValue(CB.BUILD_CATEGORY);
-  const statusVal = record.getCellValue(CB.MODERATION_STATUS);
-  const screenshots = record.getCellValue(CB.SCREENSHOTS);
+  const categoryVal = getCellValueSafe(record, CB.BUILD_CATEGORY);
+  const statusVal = getCellValueSafe(record, CB.MODERATION_STATUS);
+  const screenshots = getCellValueSafe(record, CB.SCREENSHOTS);
 
   return {
     id: record.id,
@@ -93,7 +93,7 @@ export function CommunitySpotlight() {
 function CommunitySpotlightInner({ table }) {
   const [showAll, setShowAll] = useState(false);
   const [selectedBuild, setSelectedBuild] = useState(null);
-  const buildsRecords = useRecords(table, { fields: BUILD_FIELDS });
+  const buildsRecords = useRecords(table);
 
   const builds = useMemo(() => {
     if (!buildsRecords) return [];

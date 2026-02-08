@@ -2,20 +2,62 @@
 import { FIELD_IDS } from './constants';
 
 /**
- * Safely extract a number field value by field ID
+ * Compute event status from its date string (replaces the formula field).
+ * Returns 'Final', 'Live', 'Upcoming', or 'Scheduled'.
  */
-export function getNumberField(record, fieldId) {
-  const value = record.getCellValue(fieldId);
-  if (value === null || value === undefined) return 0;
-  if (typeof value === 'number') return value;
-  return 0;
+export function computeEventStatus(dateStr, goldCountry) {
+  if (!dateStr) return 'Upcoming';
+  const eventDate = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now - eventDate;
+  const diffHours = diffMs / (1000 * 60 * 60);
+  // If results are in, it's final
+  if (goldCountry) return 'Final';
+  // If event date is in the past (>4 hours ago), likely final
+  if (diffHours > 4) return 'Final';
+  // Currently happening (within ~4 hour window)
+  if (diffHours >= -0.5 && diffHours <= 4) return 'Live';
+  // Coming up
+  return 'Upcoming';
 }
 
 /**
- * Safely extract a string field value by field ID
+ * Safely extract a number field value by field ID.
+ * Returns 0 if the field doesn't exist in the Interface data source.
+ */
+export function getNumberField(record, fieldId) {
+  try {
+    const value = record.getCellValue(fieldId);
+    if (value === null || value === undefined) return 0;
+    if (typeof value === 'number') return value;
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Safely extract a string field value by field ID.
+ * Returns '' if the field doesn't exist in the Interface data source.
  */
 export function getStringField(record, fieldId) {
-  return record.getCellValueAsString(fieldId) ?? '';
+  try {
+    return record.getCellValueAsString(fieldId) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Safely extract a raw cell value by field ID.
+ * Returns null if the field doesn't exist in the Interface data source.
+ */
+export function getCellValueSafe(record, fieldId) {
+  try {
+    return record.getCellValue(fieldId);
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -23,7 +65,7 @@ export function getStringField(record, fieldId) {
  * Returns null if no record is linked
  */
 export function getLinkedRecordId(record, fieldId) {
-  const value = record.getCellValue(fieldId);
+  const value = getCellValueSafe(record, fieldId);
   if (!value || !Array.isArray(value) || value.length === 0) return null;
   return value[0].id;
 }
@@ -116,18 +158,18 @@ export function mapRecordToPlayer(record) {
  * Map an Airtable record to an Event data object
  */
 export function mapRecordToEvent(record) {
-  const sportLink = record.getCellValue(FIELD_IDS.EVENTS.SPORT);
-  const statusValue = record.getCellValue(FIELD_IDS.EVENTS.STATUS); // formula returns string
-  const goldLink = record.getCellValue(FIELD_IDS.EVENTS.GOLD_COUNTRY);
-  const silverLink = record.getCellValue(FIELD_IDS.EVENTS.SILVER_COUNTRY);
-  const bronzeLink = record.getCellValue(FIELD_IDS.EVENTS.BRONZE_COUNTRY);
+  const sportLink = getCellValueSafe(record, FIELD_IDS.EVENTS.SPORT);
+  const goldLink = getCellValueSafe(record, FIELD_IDS.EVENTS.GOLD_COUNTRY);
+  const silverLink = getCellValueSafe(record, FIELD_IDS.EVENTS.SILVER_COUNTRY);
+  const bronzeLink = getCellValueSafe(record, FIELD_IDS.EVENTS.BRONZE_COUNTRY);
+  const dateValue = getCellValueSafe(record, FIELD_IDS.EVENTS.DATE);
 
   return {
     id: record.id,
     name: getStringField(record, FIELD_IDS.EVENTS.NAME),
     sportId: sportLink?.[0]?.id ?? null,
-    date: record.getCellValue(FIELD_IDS.EVENTS.DATE),
-    status: statusValue || 'Upcoming',
+    date: dateValue,
+    status: computeEventStatus(dateValue, goldLink?.[0]?.name),
     venue: getStringField(record, FIELD_IDS.EVENTS.VENUE),
     year: getNumberField(record, FIELD_IDS.EVENTS.YEAR),
     goldCountry: goldLink?.[0]?.name ?? null,
@@ -185,11 +227,11 @@ export function computeAthleteMedalCounts(eventRecords, countryMap, yearFilter =
     ];
 
     for (const { field, countryField, medal } of positions) {
-      const athletes = record.getCellValue(field);
+      const athletes = getCellValueSafe(record, field);
       if (!athletes || !Array.isArray(athletes)) continue;
 
       // Get the country NOC: try ID lookup first, fall back to display name match
-      const countryLink = record.getCellValue(countryField);
+      const countryLink = getCellValueSafe(record, countryField);
       const countryId = countryLink?.[0]?.id;
       const countryName = countryLink?.[0]?.name;
       const country = countryId ? countryMap.get(countryId) : null;

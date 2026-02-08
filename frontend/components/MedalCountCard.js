@@ -6,7 +6,7 @@
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS, TOTAL_2026_EVENTS } from '../constants';
-import { mapRecordToCountry, computeMedalCounts, computeCountryEventMedals, getNumberField } from '../helpers';
+import { mapRecordToCountry, computeMedalCounts, computeCountryEventMedals, getNumberField, getCellValueSafe } from '../helpers';
 import { RankBadge, LiveBadge, MedalBadge } from './shared';
 
 // Fields needed from Events table to compute medals
@@ -30,8 +30,8 @@ export function MedalCountCard() {
   const countriesTable = base.getTableByIdIfExists(TABLE_IDS.COUNTRIES);
   const [expandedCountryId, setExpandedCountryId] = useState(null);
 
-  const eventRecords = useRecords(eventsTable, { fields: EVENT_MEDAL_FIELDS });
-  const countryRecords = useRecords(countriesTable, { fields: COUNTRY_NAME_FIELDS });
+  const eventRecords = useRecords(eventsTable);
+  const countryRecords = useRecords(countriesTable);
 
   // Build country lookup map
   const countryMap = useMemo(() => {
@@ -56,7 +56,7 @@ export function MedalCountCard() {
     for (const record of eventRecords) {
       const year = getNumberField(record, FIELD_IDS.EVENTS.YEAR);
       if (year !== 2026) continue;
-      const gold = record.getCellValue(FIELD_IDS.EVENTS.GOLD_COUNTRY);
+      const gold = getCellValueSafe(record, FIELD_IDS.EVENTS.GOLD_COUNTRY);
       if (gold && Array.isArray(gold) && gold.length > 0) count++;
     }
     return count;

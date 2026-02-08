@@ -5,7 +5,7 @@
 import { useState, useMemo } from 'react';
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
-import { getNumberField } from '../helpers';
+import { getNumberField, getStringField, computeEventStatus, getCellValueSafe } from '../helpers';
 import { CommunitySpotlight } from './CommunitySpotlight';
 
 // Base ID used to construct share + embed URLs
@@ -71,7 +71,7 @@ export function BuilderSection() {
 
   const athleteRecords = useRecords(athletesTable);
   const countryRecords = useRecords(countriesTable);
-  const eventRecords = useRecords(eventsTable, { fields: [FIELD_IDS.EVENTS.STATUS, FIELD_IDS.EVENTS.YEAR] });
+  const eventRecords = useRecords(eventsTable);
   const sportRecords = useRecords(sportsTable);
 
   // Compute live stats
@@ -80,8 +80,11 @@ export function BuilderSection() {
       (r) => getNumberField(r, FIELD_IDS.EVENTS.YEAR) === 2026
     );
     const medalsAwarded = events2026.filter((r) => {
-      const status = r.getCellValue(FIELD_IDS.EVENTS.STATUS);
-      return status?.name === 'Final';
+      const status = computeEventStatus(
+        getCellValueSafe(r, FIELD_IDS.EVENTS.DATE),
+        getStringField(r, FIELD_IDS.EVENTS.GOLD_COUNTRY)
+      );
+      return status === 'Final';
     }).length;
 
     return {

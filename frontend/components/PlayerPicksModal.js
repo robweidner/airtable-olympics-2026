@@ -7,7 +7,7 @@
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo } from 'react';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
-import { getNumberField, getStringField } from '../helpers';
+import { getNumberField, getStringField, getCellValueSafe } from '../helpers';
 
 const PICK_FIELDS = [
   FIELD_IDS.PICKS.PLAYER,
@@ -21,7 +21,7 @@ const PICK_FIELDS = [
 function mapRecordToPick(record) {
   return {
     id: record.id,
-    playerId: record.getCellValue(FIELD_IDS.PICKS.PLAYER)?.[0]?.id ?? null,
+    playerId: getCellValueSafe(record, FIELD_IDS.PICKS.PLAYER)?.[0]?.id ?? null,
     event: getStringField(record, FIELD_IDS.PICKS.EVENT),
     gold: getStringField(record, FIELD_IDS.PICKS.GOLD_COUNTRY),
     silver: getStringField(record, FIELD_IDS.PICKS.SILVER_COUNTRY),
@@ -33,7 +33,7 @@ function mapRecordToPick(record) {
 export function PlayerPicksModal({ player, onClose }) {
   const base = useBase();
   const picksTable = base.getTableByIdIfExists(TABLE_IDS.PICKS);
-  const allPickRecords = useRecords(picksTable, { fields: PICK_FIELDS });
+  const allPickRecords = useRecords(picksTable);
 
   const playerPicks = useMemo(() => {
     if (!allPickRecords || !player) return [];

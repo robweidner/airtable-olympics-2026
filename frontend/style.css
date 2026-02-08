@@ -213,7 +213,180 @@
   animation: hero-logos-fade 0.6s ease-out both;
 }
 
-/* Gold outline button hover */
-.hero-btn-gold:hover {
-  background-color: rgba(212, 168, 67, 0.08);
+/* =============================================================
+ * Hero Section — Ambient Effects (CSS-only, GPU-composited)
+ * ============================================================= */
+
+/* ── Snow particles (light mode) ─────────────────────────── */
+@keyframes hero-snow-fall {
+  0%   { transform: translateY(-10px); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.hero-snow::before,
+.hero-snow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.hero-snow::before {
+  background-image:
+    radial-gradient(2px 2px at 10% 20%, rgba(180,200,220,0.6) 50%, transparent 50%),
+    radial-gradient(2px 2px at 25% 60%, rgba(180,200,220,0.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 40% 10%, rgba(180,200,220,0.4) 50%, transparent 50%),
+    radial-gradient(2px 2px at 55% 45%, rgba(180,200,220,0.55) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 70% 75%, rgba(180,200,220,0.45) 50%, transparent 50%),
+    radial-gradient(2px 2px at 85% 30%, rgba(180,200,220,0.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 95% 55%, rgba(180,200,220,0.4) 50%, transparent 50%);
+  background-size: 100% 100%;
+  animation: hero-snow-fall 8s linear infinite;
+}
+
+.hero-snow::after {
+  background-image:
+    radial-gradient(1.5px 1.5px at 5% 40%, rgba(180,200,220,0.4) 50%, transparent 50%),
+    radial-gradient(2px 2px at 18% 80%, rgba(180,200,220,0.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 33% 25%, rgba(180,200,220,0.35) 50%, transparent 50%),
+    radial-gradient(2px 2px at 48% 70%, rgba(180,200,220,0.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 62% 15%, rgba(180,200,220,0.4) 50%, transparent 50%),
+    radial-gradient(2px 2px at 78% 55%, rgba(180,200,220,0.45) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 90% 85%, rgba(180,200,220,0.35) 50%, transparent 50%);
+  background-size: 100% 100%;
+  animation: hero-snow-fall 12s linear infinite;
+  animation-delay: -4s;
+}
+
+/* ── Aurora shimmer (light mode) ─────────────────────────── */
+@keyframes hero-aurora {
+  0%   { opacity: 0.06; background-position: 0% 50%; }
+  50%  { opacity: 0.10; background-position: 100% 50%; }
+  100% { opacity: 0.06; background-position: 0% 50%; }
+}
+
+.hero-aurora {
+  background: linear-gradient(
+    120deg,
+    rgba(0,133,199,0.15),     /* Olympic blue */
+    rgba(247,181,0,0.10),      /* Olympic yellow */
+    rgba(0,160,80,0.10),       /* Olympic green */
+    rgba(238,51,78,0.08)       /* Olympic red */
+  );
+  background-size: 300% 300%;
+  animation: hero-aurora 10s ease-in-out infinite;
+}
+
+/* ── Stadium spotlights (dark mode) ──────────────────────── */
+@keyframes hero-spotlight-pulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%      { opacity: 0.25; transform: scale(1.05); }
+}
+
+.hero-spotlight-left {
+  background: radial-gradient(ellipse at 20% 40%, rgba(22,110,225,0.35) 0%, transparent 65%);
+  animation: hero-spotlight-pulse 6s ease-in-out infinite;
+}
+
+.hero-spotlight-right {
+  background: radial-gradient(ellipse at 80% 60%, rgba(212,168,67,0.30) 0%, transparent 65%);
+  animation: hero-spotlight-pulse 6s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+/* ── Electric particles (dark mode) ──────────────────────── */
+@keyframes hero-particles-rise {
+  0%   { transform: translateY(20px); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+.hero-particles::before,
+.hero-particles::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.hero-particles::before {
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 90%, rgba(91,163,245,0.7) 50%, transparent 50%),
+    radial-gradient(1px 1px at 28% 85%, rgba(212,168,67,0.6) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 45% 92%, rgba(91,163,245,0.5) 50%, transparent 50%),
+    radial-gradient(1px 1px at 60% 88%, rgba(212,168,67,0.55) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 75% 95%, rgba(91,163,245,0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 88% 87%, rgba(212,168,67,0.5) 50%, transparent 50%);
+  background-size: 100% 100%;
+  animation: hero-particles-rise 10s linear infinite;
+}
+
+.hero-particles::after {
+  background-image:
+    radial-gradient(1px 1px at 8% 93%, rgba(212,168,67,0.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 22% 88%, rgba(91,163,245,0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 38% 95%, rgba(212,168,67,0.45) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 52% 90%, rgba(91,163,245,0.55) 50%, transparent 50%),
+    radial-gradient(1px 1px at 68% 93%, rgba(212,168,67,0.5) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 82% 86%, rgba(91,163,245,0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 95% 91%, rgba(212,168,67,0.45) 50%, transparent 50%);
+  background-size: 100% 100%;
+  animation: hero-particles-rise 14s linear infinite;
+  animation-delay: -5s;
+}
+
+/* ── Olympic 5-color stripe ──────────────────────────────── */
+.hero-olympic-stripe {
+  background: linear-gradient(
+    90deg,
+    transparent 2%,
+    #0085C7 15%,   /* Blue */
+    #F4C300 30%,   /* Yellow */
+    #000000 45%,   /* Black */
+    #009F3D 60%,   /* Green */
+    #DF0024 75%,   /* Red */
+    transparent 98%
+  );
+}
+
+.hero-olympic-stripe-dark {
+  background: linear-gradient(
+    90deg,
+    transparent 2%,
+    #3DA5F4 15%,   /* Blue (brighter) */
+    #F4C300 30%,   /* Yellow */
+    #FFFFFF 45%,   /* White (replaces black) */
+    #2ECE5B 60%,   /* Green (brighter) */
+    #FF3352 75%,   /* Red (brighter) */
+    transparent 98%
+  );
+}
+
+/* ── Title glow (dark mode) ──────────────────────────────── */
+@keyframes hero-title-glow {
+  0%, 100% { text-shadow: 0 0 20px rgba(91,163,245,0.15), 0 0 40px rgba(91,163,245,0.05); }
+  50%      { text-shadow: 0 0 25px rgba(91,163,245,0.25), 0 0 50px rgba(91,163,245,0.10); }
+}
+
+.hero-title-glow {
+  animation: hero-title-glow 4s ease-in-out infinite;
+}
+
+/* ── CTA button glow (dark mode) ─────────────────────────── */
+@keyframes hero-btn-glow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(22,110,225,0.3), 0 0 30px rgba(22,110,225,0.1); }
+  50%      { box-shadow: 0 4px 25px rgba(22,110,225,0.5), 0 0 40px rgba(22,110,225,0.2); }
+}
+
+.hero-btn-glow {
+  animation: hero-btn-glow 3s ease-in-out infinite;
 }

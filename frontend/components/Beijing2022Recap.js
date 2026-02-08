@@ -27,8 +27,8 @@ export function Beijing2022Recap() {
   const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
   const countriesTable = base.getTableByIdIfExists(TABLE_IDS.COUNTRIES);
 
-  const eventRecords = useRecords(eventsTable, { fields: EVENT_MEDAL_FIELDS });
-  const countryRecords = useRecords(countriesTable, { fields: COUNTRY_NAME_FIELDS });
+  const eventRecords = useRecords(eventsTable);
+  const countryRecords = useRecords(countriesTable);
 
   // Build country lookup map
   const countryMap = useMemo(() => {

@@ -19,7 +19,6 @@ const EVENT_FIELDS = [
   FIELD_IDS.EVENTS.NAME,
   FIELD_IDS.EVENTS.SPORT,
   FIELD_IDS.EVENTS.DATE,
-  FIELD_IDS.EVENTS.STATUS,
   FIELD_IDS.EVENTS.YEAR,
   FIELD_IDS.EVENTS.GOLD_COUNTRY,
   FIELD_IDS.EVENTS.SILVER_COUNTRY,
@@ -35,8 +34,8 @@ export function EventsBoard({ onMakeMyPicks, onPickEvent }) {
   const sportsTable = base.getTableByIdIfExists(TABLE_IDS.SPORTS);
   const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
 
-  const sportsRecords = useRecords(sportsTable, { fields: SPORT_FIELDS });
-  const eventsRecords = useRecords(eventsTable, { fields: EVENT_FIELDS });
+  const sportsRecords = useRecords(sportsTable);
+  const eventsRecords = useRecords(eventsTable);
 
   const [expandedSportId, setExpandedSportId] = useState(null);
 

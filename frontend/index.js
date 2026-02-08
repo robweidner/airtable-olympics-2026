@@ -2,7 +2,7 @@ import { initializeBlock, useBase, useRecords, useSession } from '@airtable/bloc
 import { useMemo, useState } from 'react';
 import './style.css';
 import { TABLE_IDS, FIELD_IDS } from './constants';
-import { getStringField, getNumberField } from './helpers';
+import { getStringField, getNumberField, getCellValueSafe } from './helpers';
 
 import { LandingHero } from './components/LandingHero';
 import { MedalCountCard } from './components/MedalCountCard';
@@ -35,7 +35,7 @@ function FantasyOlympicsLanding() {
   const session = useSession();
   const base = useBase();
   const playersTable = base.getTableByIdIfExists(TABLE_IDS.PLAYERS);
-  const playerRecords = useRecords(playersTable, { fields: PLAYER_FIELDS_FOR_MATCH });
+  const playerRecords = useRecords(playersTable);
 
   const currentPlayer = useMemo(() => {
     if (!session.currentUser || !playerRecords) return null;
@@ -55,7 +55,7 @@ function FantasyOlympicsLanding() {
 
     if (!match) return null;
 
-    const status = match.getCellValue(FIELD_IDS.PLAYERS.REGISTRATION_STATUS);
+    const status = getCellValueSafe(match, FIELD_IDS.PLAYERS.REGISTRATION_STATUS);
     if (status?.name !== 'Approved') return null;
 
     return {
@@ -90,6 +90,7 @@ function FantasyOlympicsLanding() {
           currentPlayer={currentPlayer}
           currentPlayerRank={currentPlayerRank}
           totalPlayers={totalPlayers}
+          isDark={resolved === 'dark'}
         />
 
         {/* What's On - Live & upcoming events */}
