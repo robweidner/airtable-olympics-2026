@@ -1,11 +1,12 @@
 /**
- * CountdownTimer - Live countdown to Opening Ceremonies
- * Updates every second
+ * CountdownTimer - Live countdown to Opening Ceremonies.
+ * Supports a `darkHero` prop for rendering on the always-dark hero section.
+ * Updates every second.
  */
 import { useState, useEffect } from 'react';
 import { OPENING_CEREMONY_DATE } from '../constants';
 
-export function CountdownTimer() {
+export function CountdownTimer({ darkHero }) {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
@@ -32,7 +33,11 @@ export function CountdownTimer() {
   if (timeLeft.started) {
     return (
       <div className="text-center mb-8">
-        <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-greenLight2 dark:bg-green-greenDark1/30 text-green-greenDark1 dark:text-green-greenLight1 rounded-full font-semibold shadow-sm">
+        <span className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold shadow-sm ${
+          darkHero
+            ? 'text-green-greenLight1'
+            : 'bg-green-greenLight2 dark:bg-green-greenDark1/30 text-green-greenDark1 dark:text-green-greenLight1'
+        }`} style={darkHero ? { backgroundColor: 'rgba(4,138,14,0.15)' } : undefined}>
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-green opacity-75" />
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-green" />
@@ -45,21 +50,28 @@ export function CountdownTimer() {
 
   return (
     <div className="flex justify-center gap-3 sm:gap-6 mb-8">
-      <TimeUnit value={timeLeft.days} label="Days" />
-      <TimeUnit value={timeLeft.hours} label="Hours" />
-      <TimeUnit value={timeLeft.minutes} label="Min" />
-      <TimeUnit value={timeLeft.seconds} label="Sec" />
+      <TimeUnit value={timeLeft.days} label="Days" darkHero={darkHero} />
+      <TimeUnit value={timeLeft.hours} label="Hours" darkHero={darkHero} />
+      <TimeUnit value={timeLeft.minutes} label="Min" darkHero={darkHero} />
+      <TimeUnit value={timeLeft.seconds} label="Sec" darkHero={darkHero} />
     </div>
   );
 }
 
-function TimeUnit({ value, label }) {
+function TimeUnit({ value, label, darkHero }) {
   return (
     <div className="text-center">
-      <div className="text-3xl sm:text-4xl font-bold text-blue-blue tabular-nums">
+      <div className={`text-3xl sm:text-4xl font-bold tabular-nums ${
+        darkHero ? 'text-white' : 'text-blue-blue'
+      }`}>
         {String(value).padStart(2, '0')}
       </div>
-      <div className="text-xs sm:text-sm text-tertiary uppercase tracking-wide">
+      <div
+        className={`text-xs sm:text-sm uppercase tracking-wide ${
+          darkHero ? '' : 'text-tertiary'
+        }`}
+        style={darkHero ? { color: 'rgba(255,255,255,0.4)' } : undefined}
+      >
         {label}
       </div>
     </div>

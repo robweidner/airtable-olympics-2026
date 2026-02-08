@@ -169,3 +169,51 @@
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+/* =============================================================
+ * Hero Section — Entrance Animations
+ * ============================================================= */
+
+@keyframes hero-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-slide-left {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hero-slide-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hero-logos-fade {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-content-enter {
+  animation: hero-fade-up 0.8s ease-out both;
+  animation-delay: 0.2s;
+}
+
+.hero-logo-left {
+  animation: hero-slide-left 0.7s ease-out both;
+  animation-delay: 0.1s;
+}
+
+.hero-logo-right {
+  animation: hero-slide-right 0.7s ease-out both;
+  animation-delay: 0.1s;
+}
+
+.hero-logos-enter {
+  animation: hero-logos-fade 0.6s ease-out both;
+}
+
+/* Gold outline button hover */
+.hero-btn-gold:hover {
+  background-color: rgba(212, 168, 67, 0.08);
+}
