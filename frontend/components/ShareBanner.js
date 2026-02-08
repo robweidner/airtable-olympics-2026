@@ -20,7 +20,7 @@ export function ShareBanner() {
 
   return (
     <section className="px-4 sm:px-8 pb-2">
-      <div className="max-w-5xl mx-auto bg-gradient-to-r from-blue-blueLight3 to-white dark:from-blue-blueDark1/20 dark:to-transparent rounded-xl border border-blue-blueLight1 dark:border-blue-blueDark1/40 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-blue-blueLight3 to-white dark:from-blue-blueDark1/20 dark:to-transparent rounded-xl border border-blue-blueLight1 dark:border-blue-blueDark1/40 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-center sm:text-left">
           <p className="text-primary font-semibold text-base">
             Think your friends can beat you?

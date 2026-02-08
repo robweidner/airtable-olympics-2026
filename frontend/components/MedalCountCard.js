@@ -7,7 +7,7 @@ import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS, TOTAL_2026_EVENTS } from '../constants';
 import { mapRecordToCountry, computeMedalCounts, computeCountryEventMedals, getNumberField, getCellValueSafe } from '../helpers';
-import { RankBadge, LiveBadge, MedalBadge } from './shared';
+import { RankBadge, LiveBadge, MedalBadge, YearToggle } from './shared';
 
 // Fields needed from Events table to compute medals
 const EVENT_MEDAL_FIELDS = [
@@ -29,6 +29,7 @@ export function MedalCountCard() {
   const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
   const countriesTable = base.getTableByIdIfExists(TABLE_IDS.COUNTRIES);
   const [expandedCountryId, setExpandedCountryId] = useState(null);
+  const [yearFilter, setYearFilter] = useState(2026);
 
   const eventRecords = useRecords(eventsTable);
   const countryRecords = useRecords(countriesTable);
@@ -43,13 +44,13 @@ export function MedalCountCard() {
     return map;
   }, [countryRecords]);
 
-  // Compute 2026 medal counts from Events
+  // Compute medal counts from Events (filtered by selected year)
   const topCountries = useMemo(() => {
     if (!eventRecords) return [];
-    return computeMedalCounts(eventRecords, countryMap, 2026).slice(0, 10);
-  }, [eventRecords, countryMap]);
+    return computeMedalCounts(eventRecords, countryMap, yearFilter).slice(0, 10);
+  }, [eventRecords, countryMap, yearFilter]);
 
-  // Count events that have at least one medal awarded (2026 only)
+  // Count events that have at least one medal awarded (for progress bar, always 2026)
   const eventsDecided = useMemo(() => {
     if (!eventRecords) return 0;
     let count = 0;
@@ -71,10 +72,14 @@ export function MedalCountCard() {
   // Event medals for the expanded country
   const expandedMedals = useMemo(() => {
     if (!expandedCountryId || !eventRecords) return [];
-    return computeCountryEventMedals(eventRecords, expandedCountryId, 2026);
-  }, [expandedCountryId, eventRecords]);
+    return computeCountryEventMedals(eventRecords, expandedCountryId, yearFilter);
+  }, [expandedCountryId, eventRecords, yearFilter]);
 
   const progressPct = Math.round((eventsDecided / TOTAL_2026_EVENTS) * 100);
+
+  const yearLabel = yearFilter === 2026 ? 'Milano-Cortina 2026'
+    : yearFilter === 2022 ? 'Beijing 2022'
+      : 'All Time';
 
   if (!eventsTable || !countriesTable) {
     return (
@@ -93,10 +98,12 @@ export function MedalCountCard() {
           <h2 className="text-xl font-semibold text-secondary">Medal Count</h2>
           <LiveBadge />
         </div>
-        <p className="text-sm text-muted mb-2">Milano-Cortina 2026</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm text-muted">{yearLabel}</p>
+          <YearToggle value={yearFilter} onChange={setYearFilter} />
+        </div>
 
-        {/* Progress bar at 0% */}
-        <ProgressBar eventsDecided={0} progressPct={0} />
+        {yearFilter === 2026 && <ProgressBar eventsDecided={0} progressPct={0} />}
 
         <div className="text-center py-6">
           <div className="flex justify-center gap-8 mb-4">
@@ -118,10 +125,15 @@ export function MedalCountCard() {
         <h2 className="text-xl font-semibold text-secondary">Medal Count</h2>
         <LiveBadge />
       </div>
-      <p className="text-sm text-muted mb-2">Milano-Cortina 2026</p>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm text-muted">{yearLabel}</p>
+        <YearToggle value={yearFilter} onChange={(y) => { setYearFilter(y); setExpandedCountryId(null); }} />
+      </div>
 
-      {/* Progress bar */}
-      <ProgressBar eventsDecided={eventsDecided} progressPct={progressPct} />
+      {/* Progress bar (always shows 2026 progress) */}
+      {yearFilter === 2026 && (
+        <ProgressBar eventsDecided={eventsDecided} progressPct={progressPct} />
+      )}
 
       <div className="space-y-1">
         {topCountries.map((country, index) => {

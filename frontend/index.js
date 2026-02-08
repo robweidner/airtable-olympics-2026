@@ -15,7 +15,9 @@ import { BuilderSection } from './components/BuilderSection';
 import { OlympicNewsCard } from './components/OlympicNewsCard';
 import { ShareBanner } from './components/ShareBanner';
 import { PicksChoiceModal } from './components/PicksChoiceModal';
+import { FullSchedulePage } from './components/FullSchedulePage';
 import { useTheme, ThemeToggle } from './components/ThemeToggle';
+import { CommunitySpotlight } from './components/CommunitySpotlight';
 
 const PLAYER_FIELDS_FOR_MATCH = [
   FIELD_IDS.PLAYERS.NAME,
@@ -26,9 +28,34 @@ const PLAYER_FIELDS_FOR_MATCH = [
   FIELD_IDS.PLAYERS.PIN,
 ];
 
+function FantasyCallToAction({ onMakeMyPicks }) {
+  return (
+    <div className="bg-gradient-to-r from-blue-blueLight3 to-surface dark:from-blue-blueDark1/15 dark:to-surface rounded-lg border border-blue-blueLight1 dark:border-blue-blueDark1/40 px-5 py-4 shadow-theme-sm">
+      <div className="flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-primary">
+            Predict Gold, Silver &amp; Bronze for each event
+          </p>
+          <p className="text-xs text-tertiary mt-0.5">
+            3 pts exact &middot; 2 pts on podium &middot; 116 events
+          </p>
+        </div>
+        <button
+          onClick={onMakeMyPicks}
+          className="flex-shrink-0 px-4 py-2 bg-blue-blue hover:bg-blue-blueDark1 text-white text-sm font-semibold rounded-md shadow-theme-sm transition-colors"
+        >
+          Make My Picks
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function FantasyOlympicsLanding() {
   // null = closed, '' = open with no prefill, 'Event Name' = open with prefill
   const [picksEventName, setPicksEventName] = useState(null);
+  // 'home' | 'schedule'
+  const [currentPage, setCurrentPage] = useState('home');
   const { preference, resolved, cycle } = useTheme();
 
   // Resolve logged-in user to a player record (collaborators only)
@@ -83,92 +110,131 @@ function FantasyOlympicsLanding() {
 
   return (
     <div className={resolved === 'dark' ? 'dark' : ''}>
-      <div className="min-h-screen bg-surface-page">
-        {/* Hero Section */}
-        <LandingHero
-          onMakeMyPicks={() => setPicksEventName('')}
-          currentPlayer={currentPlayer}
-          currentPlayerRank={currentPlayerRank}
-          totalPlayers={totalPlayers}
-          isDark={resolved === 'dark'}
-        />
-
-        {/* What's On - Live & upcoming events */}
-        <UpcomingEvents
-          onMakeMyPicks={() => setPicksEventName('')}
-          onPickEvent={(eventName) => setPicksEventName(eventName)}
-        />
-
-        {/* Stats Section - Medal Count & Leaderboard */}
-        <section className="py-12 px-4 sm:px-8">
-          <div className="grid md:grid-cols-2 gap-6">
-            <MedalCountCard />
-            <LeaderboardCard />
-          </div>
-          <div className="mt-6">
-            <AthleteLeaderboardCard />
-          </div>
-        </section>
-
-        {/* Share CTA - placed after leaderboard to capitalize on competitive curiosity */}
-        <ShareBanner />
-
-        {/* Olympic News Feed */}
-        <section className="px-4 sm:px-8 pb-12">
-          <div className="max-w-5xl mx-auto">
-            <OlympicNewsCard />
-          </div>
-        </section>
-
-        {/* Events Board */}
-        <EventsBoard
-          onMakeMyPicks={() => setPicksEventName('')}
-          onPickEvent={(eventName) => setPicksEventName(eventName)}
-        />
-
-        {/* 2022 Beijing Recap - Historical Context (collapsed by default) */}
-        <Beijing2022Recap />
-
-        {/* Builder Section */}
-        <BuilderSection />
-
-        {/* Footer */}
-        <footer className="py-8 px-4 text-center text-muted text-sm">
-          <p>
-            Built with Airtable Interface Extensions SDK
-          </p>
-          <p className="mt-1">
-            Winter Olympics 2026 {'\u00B7'} Milano Cortina
-          </p>
-          <p className="mt-2">
-            Created by{' '}
-            <a
-              href="https://airtable.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-blue hover:text-blue-blueDark1 transition-colors"
-            >
-              Airtable
-            </a>
-            {' '}and{' '}
-            <a
-              href="https://robweidner.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-blue hover:text-blue-blueDark1 transition-colors"
-            >
-              Rob Weidner
-            </a>
-          </p>
-        </footer>
-
-        {picksEventName !== null && (
-          <PicksChoiceModal
-            eventName={picksEventName}
-            onClose={() => setPicksEventName(null)}
+      {currentPage === 'home' && (
+        <div className="min-h-screen bg-surface-page">
+          {/* Hero Section */}
+          <LandingHero
+            onMakeMyPicks={() => setCurrentPage('schedule')}
+            currentPlayer={currentPlayer}
+            currentPlayerRank={currentPlayerRank}
+            totalPlayers={totalPlayers}
+            isDark={resolved === 'dark'}
           />
-        )}
-      </div>
+
+          {/* What's On - Live & upcoming events */}
+          <UpcomingEvents
+            onMakeMyPicks={() => setPicksEventName('')}
+            onPickEvent={(eventName) => setPicksEventName(eventName)}
+            onNavigateToSchedule={() => setCurrentPage('schedule')}
+          />
+
+          {/* Stats Section - Olympics Results (left) vs Fantasy Game (right) */}
+          <section className="py-12 px-4 sm:px-8">
+            <div className="grid md:grid-cols-2 gap-8">
+
+              {/* LEFT: Actual Olympics Results */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl" role="img" aria-label="Olympics">&#9734;</span>
+                  <div>
+                    <h2 className="text-2xl font-display font-bold text-primary">
+                      The Games
+                    </h2>
+                    <p className="text-sm text-tertiary">
+                      Live results from Milano-Cortina 2026
+                    </p>
+                  </div>
+                </div>
+                <MedalCountCard />
+                <AthleteLeaderboardCard />
+              </div>
+
+              {/* RIGHT: Fantasy Game */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl" role="img" aria-label="Fantasy">&#127919;</span>
+                  <div>
+                    <h2 className="text-2xl font-display font-bold text-primary">
+                      Fantasy Game
+                    </h2>
+                    <p className="text-sm text-tertiary">
+                      Predict the podium, climb the leaderboard
+                    </p>
+                  </div>
+                </div>
+                <LeaderboardCard />
+                <FantasyCallToAction onMakeMyPicks={() => setCurrentPage('schedule')} />
+                <CommunitySpotlight />
+              </div>
+
+            </div>
+          </section>
+
+          {/* Share CTA - placed after leaderboard to capitalize on competitive curiosity */}
+          <ShareBanner />
+
+          {/* Olympic News Feed */}
+          <section className="px-4 sm:px-8 pb-12">
+            <OlympicNewsCard />
+          </section>
+
+          {/* Events Board */}
+          <EventsBoard
+            onMakeMyPicks={() => setCurrentPage('schedule')}
+            onPickEvent={(eventName) => setPicksEventName(eventName)}
+          />
+
+          {/* 2022 Beijing Recap - Historical Context (collapsed by default) */}
+          <Beijing2022Recap />
+
+          {/* Builder Section */}
+          <BuilderSection />
+
+          {/* Footer */}
+          <footer className="py-8 px-4 text-center text-muted text-sm">
+            <p>
+              Built with Airtable Interface Extensions SDK
+            </p>
+            <p className="mt-1">
+              Winter Olympics 2026 {'\u00B7'} Milano Cortina
+            </p>
+            <p className="mt-2">
+              Created by{' '}
+              <a
+                href="https://airtable.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-blue hover:text-blue-blueDark1 transition-colors"
+              >
+                Airtable
+              </a>
+              {' '}and{' '}
+              <a
+                href="https://robweidner.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-blue hover:text-blue-blueDark1 transition-colors"
+              >
+                Rob Weidner
+              </a>
+            </p>
+          </footer>
+        </div>
+      )}
+
+      {currentPage === 'schedule' && (
+        <FullSchedulePage
+          onPickEvent={(eventName) => setPicksEventName(eventName)}
+          onBack={() => { setCurrentPage('home'); window.scrollTo(0, 0); }}
+        />
+      )}
+
+      {picksEventName !== null && (
+        <PicksChoiceModal
+          eventName={picksEventName}
+          onClose={() => setPicksEventName(null)}
+        />
+      )}
       <ThemeToggle preference={preference} onCycle={cycle} />
     </div>
   );

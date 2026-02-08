@@ -120,16 +120,16 @@ module.exports = {
                 1: '0.25rem',
             },
             fontSize: {
-                xs: ['0.5625rem', '0.875rem'],
-                sm: ['0.6875rem', '1rem'],
-                base: ['0.8125rem', '1.25rem'],
-                lg: ['0.9375rem', '1.375rem'],
-                xl: ['1.0625rem', '1.5rem'],
-                '2xl': ['1.3125rem', '1.625rem'],
-                '3xl': ['1.4375rem', '1.8125rem'],
-                '4xl': ['1.6875rem', '2.125rem'],
-                '5xl': ['1.9375rem', '2.5rem'],
-                '6xl': ['2.1875rem', '2.75rem'],
+                xs: ['0.6875rem', '1rem'],         // 11px / 16px (was 9px)
+                sm: ['0.8125rem', '1.125rem'],      // 13px / 18px (was 11px)
+                base: ['0.9375rem', '1.375rem'],    // 15px / 22px (was 13px)
+                lg: ['1.0625rem', '1.5rem'],        // 17px / 24px (was 15px)
+                xl: ['1.1875rem', '1.625rem'],      // 19px / 26px (was 17px)
+                '2xl': ['1.4375rem', '1.875rem'],   // 23px / 30px (was 21px)
+                '3xl': ['1.625rem', '2.125rem'],    // 26px / 34px (was 23px)
+                '4xl': ['1.875rem', '2.375rem'],    // 30px / 38px (was 27px)
+                '5xl': ['2.125rem', '2.625rem'],    // 34px / 42px (was 31px)
+                '6xl': ['2.375rem', '3rem'],        // 38px / 48px (was 35px)
             },
             fontWeight: {
                 normal: '400',

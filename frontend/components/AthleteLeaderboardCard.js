@@ -7,7 +7,7 @@ import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToCountry, computeAthleteMedalCounts, getStringField } from '../helpers';
-import { RankBadge, LiveBadge, MedalBadge } from './shared';
+import { RankBadge, LiveBadge, MedalBadge, YearToggle } from './shared';
 import { AthleteProfileModal } from './AthleteProfileModal';
 
 // Fields needed from Events to compute athlete medals
@@ -37,6 +37,7 @@ export function AthleteLeaderboardCard() {
   const countriesTable = base.getTableByIdIfExists(TABLE_IDS.COUNTRIES);
   const athletesTable = base.getTableByIdIfExists(TABLE_IDS.ATHLETES);
   const [selectedAthleteId, setSelectedAthleteId] = useState(null);
+  const [yearFilter, setYearFilter] = useState(2026);
 
   const eventRecords = useRecords(eventsTable);
   const countryRecords = useRecords(countriesTable);
@@ -66,13 +67,17 @@ export function AthleteLeaderboardCard() {
   // Compute top 10 athletes, then patch NOC from Athletes table
   const topAthletes = useMemo(() => {
     if (!eventRecords) return [];
-    const athletes = computeAthleteMedalCounts(eventRecords, countryMap, 2026);
+    const athletes = computeAthleteMedalCounts(eventRecords, countryMap, yearFilter);
     for (const athlete of athletes) {
       const directNoc = athleteNocMap.get(athlete.id);
       if (directNoc) athlete.noc = directNoc;
     }
     return athletes.slice(0, 10);
-  }, [eventRecords, countryMap, athleteNocMap]);
+  }, [eventRecords, countryMap, athleteNocMap, yearFilter]);
+
+  const yearLabel = yearFilter === 2026 ? 'Milano-Cortina 2026'
+    : yearFilter === 2022 ? 'Beijing 2022'
+      : 'All Time';
 
   // Find the selected athlete's record for the modal
   const selectedAthleteRecord = useMemo(() => {
@@ -97,7 +102,10 @@ export function AthleteLeaderboardCard() {
           <h2 className="text-xl font-semibold text-secondary">Top Athletes</h2>
           <LiveBadge />
         </div>
-        <p className="text-sm text-muted mb-4">Milano-Cortina 2026</p>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-muted">{yearLabel}</p>
+          <YearToggle value={yearFilter} onChange={setYearFilter} />
+        </div>
         <div className="text-center py-6">
           <span className="text-3xl">&#9975;&#65039;</span>
           <p className="text-tertiary text-sm mt-2">
@@ -114,9 +122,12 @@ export function AthleteLeaderboardCard() {
         <h2 className="text-xl font-semibold text-secondary">Top Athletes</h2>
         <LiveBadge />
       </div>
-      <p className="text-sm text-muted mb-4">Milano-Cortina 2026</p>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-muted">{yearLabel}</p>
+        <YearToggle value={yearFilter} onChange={setYearFilter} />
+      </div>
 
-      <div className="max-w-2xl">
+      <div>
         {/* Table header */}
         <div className={`hidden sm:grid ${GRID_COLS} gap-2 px-3 pb-2 text-xs text-muted uppercase tracking-wide border-b border-light`}>
           <span>#</span>

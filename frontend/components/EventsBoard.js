@@ -75,7 +75,7 @@ export function EventsBoard({ onMakeMyPicks, onPickEvent }) {
   if (!sportsTable || !eventsTable) {
     return (
       <section className="py-12 px-4 sm:px-8 bg-surface">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="mx-auto text-center">
           <h2 className="text-2xl font-display font-bold text-primary mb-4">
             Medal Events
           </h2>
@@ -91,7 +91,7 @@ export function EventsBoard({ onMakeMyPicks, onPickEvent }) {
 
   return (
     <section id="events-section" className="py-12 px-4 sm:px-8 bg-surface">
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-auto">
         <h2 className="text-2xl font-display font-bold text-primary text-center mb-2">
           {totalEvents} Medal Events
         </h2>

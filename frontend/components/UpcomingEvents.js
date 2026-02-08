@@ -25,8 +25,8 @@ const SCHEDULE_FIELDS = [
   FIELD_IDS.EVENTS.BRONZE_ATHLETE,
 ];
 
-const MAX_UPCOMING = 8;
-const MAX_RECENT_RESULTS = 5;
+const MAX_UPCOMING = 12;
+const MAX_RECENT_RESULTS = 8;
 const LIVE_WINDOW_MS = 3 * 60 * 60 * 1000; // 3 hours — typical event duration
 
 /* ─── Time formatting helpers ─── */
@@ -80,7 +80,7 @@ function getDayLabel(dateStr, now) {
 
 /* ─── Main component ─── */
 
-export function UpcomingEvents({ onMakeMyPicks, onPickEvent }) {
+export function UpcomingEvents({ onMakeMyPicks, onPickEvent, onNavigateToSchedule }) {
   const base = useBase();
   const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
   const records = useRecords(eventsTable);
@@ -159,94 +159,117 @@ export function UpcomingEvents({ onMakeMyPicks, onPickEvent }) {
   if (!eventsTable) return null;
   if (recentResults.length === 0 && liveEvents.length === 0 && dayGroups.length === 0) return null;
 
+  const hasLeftContent = recentResults.length > 0 || liveEvents.length > 0;
+  const hasRightContent = dayGroups.length > 0;
+
   return (
     <section className="py-8 px-4 sm:px-8">
-      <div>
-        {/* ── Header ── */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl font-display font-bold text-primary">
-              What&apos;s On
-            </h2>
-            {liveEvents.length > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-redLight3 dark:bg-red-redDark1/20 text-red-red text-xs font-bold uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-red animate-pulse" />
-                Live
-              </span>
-            )}
-          </div>
-          <time className="text-xs font-mono text-muted tabular-nums">
-            {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </time>
+      {/* ── Header (full width) ── */}
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-display font-bold text-primary">
+            What&apos;s On
+          </h2>
+          {liveEvents.length > 0 && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-redLight3 dark:bg-red-redDark1/20 text-red-red text-xs font-bold uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-red animate-pulse" />
+              Live
+            </span>
+          )}
         </div>
+        <time className="text-xs font-mono text-muted tabular-nums">
+          {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </time>
+      </div>
 
-        {/* ── Recent results ── */}
-        {recentResults.length > 0 && (
-          <div className="mb-5">
-            <div className="flex items-center gap-2 mb-2">
+      {/* ── Two-column body ── */}
+      <div className={`grid gap-6 ${hasLeftContent && hasRightContent ? 'md:grid-cols-2' : ''}`}>
+
+        {/* ── Left column: Results + Live ── */}
+        {hasLeftContent && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
               <span className="text-xs font-bold uppercase tracking-wider text-tertiary">
                 Recent Results
               </span>
               <div className="flex-1 h-px bg-gradient-to-r from-gray-gray200 dark:from-gray-gray600 to-transparent" />
             </div>
+
+            {/* Live events pinned at top of results column */}
+            {liveEvents.map((event) => (
+              <LiveEventCard key={event.id} event={event} now={now} />
+            ))}
+
             <div className="space-y-0.5">
               {recentResults.map((event, i) => (
                 <ResultRow key={event.id} event={event} index={i} />
               ))}
             </div>
+
+            <div className="mt-4 pt-3 border-t border-light">
+              <button
+                className="text-sm text-blue-blue hover:text-blue-blueDark1 font-medium transition-colors"
+                onClick={onNavigateToSchedule || (() =>
+                  document
+                    .getElementById('events-section')
+                    ?.scrollIntoView({ behavior: 'smooth' })
+                )}
+              >
+                View full schedule &rarr;
+              </button>
+            </div>
           </div>
         )}
 
-        {/* ── Live events ── */}
-        {liveEvents.map((event) => (
-          <LiveEventCard key={event.id} event={event} now={now} />
-        ))}
-
-        {/* ── Upcoming events grouped by day ── */}
-        {dayGroups.map((group) => (
-          <div key={group.day} className="mb-4">
-            <div className="flex items-center gap-2 mb-2 mt-3 first:mt-0">
+        {/* ── Right column: Upcoming ── */}
+        {hasRightContent && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
               <span className="text-xs font-bold uppercase tracking-wider text-tertiary">
-                {group.day}
+                Coming Up
               </span>
               <div className="flex-1 h-px bg-gradient-to-r from-gray-gray200 dark:from-gray-gray600 to-transparent" />
             </div>
-            <div className="space-y-0.5">
-              {group.events.map((event) => (
-                <EventRow
-                  key={event.id}
-                  event={event}
-                  now={now}
-                  isNext={liveEvents.length === 0 && event.id === firstUpcomingId}
-                  index={event.animIndex}
-                  onPick={onPickEvent ? () => onPickEvent(event.name) : null}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
 
-        {/* ── Footer actions ── */}
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-light">
-          <button
-            className="text-sm text-blue-blue hover:text-blue-blueDark1 font-medium transition-colors"
-            onClick={() =>
-              document
-                .getElementById('events-section')
-                ?.scrollIntoView({ behavior: 'smooth' })
-            }
-          >
-            View full schedule →
-          </button>
-          {onMakeMyPicks && (
-            <button
-              className="px-5 py-2 bg-blue-blue hover:bg-blue-blueDark1 text-white text-sm font-medium rounded-md shadow-theme-sm transition-colors"
-              onClick={onMakeMyPicks}
-            >
-              Make My Picks
-            </button>
-          )}
-        </div>
+            <p className="text-xs text-blue-blue font-medium mb-3">
+              Pick your predictions before events start!
+            </p>
+
+            {dayGroups.map((group) => (
+              <div key={group.day} className="mb-4">
+                <div className="flex items-center gap-2 mb-2 mt-2 first:mt-0">
+                  <span className="text-xs font-bold uppercase tracking-wider text-tertiary">
+                    {group.day}
+                  </span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-gray-gray200 dark:from-gray-gray600 to-transparent" />
+                </div>
+                <div className="space-y-0.5">
+                  {group.events.map((event) => (
+                    <EventRow
+                      key={event.id}
+                      event={event}
+                      now={now}
+                      isNext={liveEvents.length === 0 && event.id === firstUpcomingId}
+                      index={event.animIndex}
+                      onPick={onPickEvent ? () => onPickEvent(event.name) : null}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {onMakeMyPicks && (
+              <div className="mt-4 pt-3 border-t border-light">
+                <button
+                  className="px-5 py-2 bg-blue-blue hover:bg-blue-blueDark1 text-white text-sm font-medium rounded-md shadow-theme-sm transition-colors"
+                  onClick={onMakeMyPicks}
+                >
+                  Make My Picks
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -318,7 +341,11 @@ function EventRow({ event, now, isNext, index, onPick }) {
       {onPick && !event.goldCountry && (
         <button
           onClick={(e) => { e.stopPropagation(); onPick(); }}
-          className="flex-shrink-0 px-3 py-1 text-xs font-medium text-blue-blue hover:text-white hover:bg-blue-blue border border-blue-blue rounded-md transition-colors"
+          className={`flex-shrink-0 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+            isNext
+              ? 'bg-blue-blue text-white hover:bg-blue-blueDark1 shadow-theme-xs'
+              : 'text-blue-blue hover:text-white hover:bg-blue-blue border border-blue-blue'
+          }`}
         >
           Pick
         </button>

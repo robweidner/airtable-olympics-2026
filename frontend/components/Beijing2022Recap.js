@@ -64,7 +64,7 @@ export function Beijing2022Recap() {
 
   return (
     <section className="py-6 px-4 sm:px-8 bg-surface-page">
-      <div className="max-w-5xl mx-auto">
+      <div>
         {/* Collapsed Header - Always visible */}
         <div
           className="flex items-center justify-between cursor-pointer group"
