@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToPlayer } from '../helpers';
 import { PlayerPicksModal } from './PlayerPicksModal';
+import { RankBadge, LiveBadge } from './shared';
 
 const PLAYER_FIELDS = [
   FIELD_IDS.PLAYERS.NAME,
@@ -60,7 +61,10 @@ export function LeaderboardCard() {
 
   return (
     <div className="bg-surface rounded-lg shadow-theme-md p-6">
-      <h2 className="text-xl font-semibold text-secondary">Leaderboard</h2>
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-xl font-semibold text-secondary">Leaderboard</h2>
+        <LiveBadge />
+      </div>
       <p className="text-sm text-muted mb-4">See how your picks stack up</p>
 
       <div className="space-y-2">
@@ -100,34 +104,5 @@ export function LeaderboardCard() {
         />
       )}
     </div>
-  );
-}
-
-function RankBadge({ rank }) {
-  if (rank === 1) {
-    return (
-      <span className="w-8 h-8 flex items-center justify-center bg-yellow-yellow rounded-full text-white font-bold text-sm shadow-sm">
-        1
-      </span>
-    );
-  }
-  if (rank === 2) {
-    return (
-      <span className="w-8 h-8 flex items-center justify-center bg-gray-gray300 rounded-full text-white font-bold text-sm shadow-sm">
-        2
-      </span>
-    );
-  }
-  if (rank === 3) {
-    return (
-      <span className="w-8 h-8 flex items-center justify-center bg-orange-orange rounded-full text-white font-bold text-sm shadow-sm">
-        3
-      </span>
-    );
-  }
-  return (
-    <span className="w-8 h-8 flex items-center justify-center text-tertiary font-medium text-sm">
-      {rank}
-    </span>
   );
 }

@@ -32,8 +32,12 @@ export function CountdownTimer() {
   if (timeLeft.started) {
     return (
       <div className="text-center mb-8">
-        <span className="inline-block px-4 py-2 bg-green-greenLight2 text-green-greenDark1 rounded-full font-semibold">
-          The Games Have Begun!
+        <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-greenLight2 dark:bg-green-greenDark1/30 text-green-greenDark1 dark:text-green-greenLight1 rounded-full font-semibold shadow-sm">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-green opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-green" />
+          </span>
+          The Games Are Live!
         </span>
       </div>
     );

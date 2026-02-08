@@ -18,14 +18,18 @@ const SPORT_FIELDS = [
 const EVENT_FIELDS = [
   FIELD_IDS.EVENTS.NAME,
   FIELD_IDS.EVENTS.SPORT,
+  FIELD_IDS.EVENTS.DATE,
   FIELD_IDS.EVENTS.STATUS,
   FIELD_IDS.EVENTS.YEAR,
   FIELD_IDS.EVENTS.GOLD_COUNTRY,
   FIELD_IDS.EVENTS.SILVER_COUNTRY,
   FIELD_IDS.EVENTS.BRONZE_COUNTRY,
+  FIELD_IDS.EVENTS.GOLD_ATHLETE,
+  FIELD_IDS.EVENTS.SILVER_ATHLETE,
+  FIELD_IDS.EVENTS.BRONZE_ATHLETE,
 ];
 
-export function EventsBoard({ onMakeMyPicks }) {
+export function EventsBoard({ onMakeMyPicks, onPickEvent }) {
   const base = useBase();
 
   const sportsTable = base.getTableByIdIfExists(TABLE_IDS.SPORTS);
@@ -51,8 +55,13 @@ export function EventsBoard({ onMakeMyPicks }) {
       eventsBySport[event.sportId].push(event);
     });
 
-    // Sort events alphabetically within each sport
-    Object.values(eventsBySport).forEach(arr => arr.sort((a, b) => a.name.localeCompare(b.name)));
+    // Sort events by date within each sport (soonest first), then alphabetically as tiebreaker
+    Object.values(eventsBySport).forEach(arr => arr.sort((a, b) => {
+      if (a.date && b.date) return new Date(a.date) - new Date(b.date);
+      if (a.date) return -1;
+      if (b.date) return 1;
+      return a.name.localeCompare(b.name);
+    }));
 
     // Only include sports that have 2026 events
     const allSports = (sportsRecords ?? []).map(mapRecordToSport);
@@ -98,6 +107,10 @@ export function EventsBoard({ onMakeMyPicks }) {
             Upcoming
           </span>
           <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-blue-blue animate-pulse" />
+            Today
+          </span>
+          <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-yellow-yellow animate-pulse" />
             Live
           </span>
@@ -116,6 +129,7 @@ export function EventsBoard({ onMakeMyPicks }) {
               isExpanded={expandedSportId === sport.id}
               onToggle={() => handleSportClick(sport.id)}
               onMakeMyPicks={onMakeMyPicks}
+              onPickEvent={onPickEvent}
             />
           ))}
         </div>
@@ -124,18 +138,18 @@ export function EventsBoard({ onMakeMyPicks }) {
   );
 }
 
-function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
+function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks, onPickEvent }) {
   const displayEvents = isExpanded ? events : events.slice(0, 5);
   const hasMore = events.length > 5;
 
   return (
     <div
-      className={`rounded-lg p-4 border transition-all duration-200 cursor-pointer ${
+      className={`rounded-lg p-4 border transition-all duration-200 ${
         isExpanded
           ? 'bg-surface border-blue-blue shadow-theme-md col-span-full'
-          : 'bg-surface-page border-light hover:border-blue-blueLight1 hover:shadow-theme-sm'
+          : 'bg-surface-page border-light hover:border-blue-blueLight1 hover:shadow-theme-sm cursor-pointer'
       }`}
-      onClick={onToggle}
+      onClick={isExpanded ? undefined : onToggle}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
@@ -143,8 +157,11 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
       }}
       aria-expanded={isExpanded}
     >
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-3">
+      {/* Header — always toggles */}
+      <div
+        className={`flex items-center gap-2 mb-3 ${isExpanded ? 'cursor-pointer' : ''}`}
+        onClick={isExpanded ? onToggle : undefined}
+      >
         <span className="text-xl">{sport.icon || '🏅'}</span>
         <h3 className="font-semibold text-primary truncate">{sport.name}</h3>
         <span className="ml-auto text-xs bg-blue-blueLight2 text-blue-blueDark1 px-2 py-0.5 rounded-full flex-shrink-0">
@@ -157,21 +174,43 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
 
       {/* Event list */}
       <ul className={`space-y-1 text-sm ${isExpanded ? 'columns-1 sm:columns-2 lg:columns-3 gap-x-6' : ''}`}>
-        {displayEvents.map(event => (
-          <li key={event.id} className="break-inside-avoid">
-            <div className="flex items-center gap-2 text-body">
-              <StatusDot status={event.status} />
-              <span className={isExpanded ? '' : 'truncate'}>{event.name}</span>
-            </div>
-            {isExpanded && event.goldCountry && (
-              <div className="ml-4 mt-0.5 mb-1 text-xs text-tertiary flex flex-wrap gap-x-3">
-                <span>🥇 {event.goldCountry}</span>
-                {event.silverCountry && <span>🥈 {event.silverCountry}</span>}
-                {event.bronzeCountry && <span>🥉 {event.bronzeCountry}</span>}
+        {displayEvents.map(event => {
+          const isFinal = event.status === 'Final';
+          const canPick = isExpanded && onPickEvent && !isFinal;
+
+          return (
+            <li key={event.id} className="break-inside-avoid">
+              <div
+                className={`flex items-center gap-2 text-body rounded px-1 -mx-1 ${
+                  canPick ? 'hover:bg-blue-blueLight3 dark:hover:bg-blue-blueDark1/10 cursor-pointer transition-colors' : ''
+                }`}
+                onClick={canPick ? (e) => { e.stopPropagation(); onPickEvent(event.name); } : undefined}
+              >
+                <StatusDot status={event.status} />
+                <span className={`${isExpanded ? '' : 'truncate'} flex-1`}>{event.name}</span>
+                {canPick && (
+                  <span className="text-xs text-blue-blue opacity-0 group-hover:opacity-100 flex-shrink-0">Pick</span>
+                )}
+                {isExpanded && event.date && (
+                  <span className="text-xs text-muted flex-shrink-0 tabular-nums">
+                    {new Date(event.date).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                  </span>
+                )}
               </div>
-            )}
-          </li>
-        ))}
+              {isExpanded && event.goldCountry && (
+                <div className="ml-4 mt-0.5 mb-1 text-xs text-tertiary space-y-0.5">
+                  <MedalResult emoji="🥇" country={event.goldCountry} athlete={event.goldAthlete} />
+                  {event.silverCountry && (
+                    <MedalResult emoji="🥈" country={event.silverCountry} athlete={event.silverAthlete} />
+                  )}
+                  {event.bronzeCountry && (
+                    <MedalResult emoji="🥉" country={event.bronzeCountry} athlete={event.bronzeAthlete} />
+                  )}
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       {/* Collapsed: prompt to expand */}
@@ -196,12 +235,22 @@ function SportCard({ sport, events, isExpanded, onToggle, onMakeMyPicks }) {
   );
 }
 
+function MedalResult({ emoji, country, athlete }) {
+  return (
+    <div className="flex items-baseline gap-1.5">
+      <span>{emoji}</span>
+      <span className="font-medium text-body">{country}</span>
+      {athlete && <span className="text-muted">· {athlete}</span>}
+    </div>
+  );
+}
+
 function StatusDot({ status }) {
   const colors = {
     'Upcoming': 'bg-gray-gray300',
+    'Now': 'bg-blue-blue animate-pulse',
     'Live': 'bg-yellow-yellow animate-pulse',
     'Final': 'bg-green-green',
-    'completed': 'bg-green-green',
   };
   return (
     <span

@@ -7,7 +7,9 @@ import { getStringField, getNumberField } from './helpers';
 import { LandingHero } from './components/LandingHero';
 import { MedalCountCard } from './components/MedalCountCard';
 import { LeaderboardCard } from './components/LeaderboardCard';
+import { AthleteLeaderboardCard } from './components/AthleteLeaderboardCard';
 import { Beijing2022Recap } from './components/Beijing2022Recap';
+import { UpcomingEvents } from './components/UpcomingEvents';
 import { EventsBoard } from './components/EventsBoard';
 import { BuilderSection } from './components/BuilderSection';
 import { OlympicNewsCard } from './components/OlympicNewsCard';
@@ -25,7 +27,8 @@ const PLAYER_FIELDS_FOR_MATCH = [
 ];
 
 function FantasyOlympicsLanding() {
-  const [showPicksModal, setShowPicksModal] = useState(false);
+  // null = closed, '' = open with no prefill, 'Event Name' = open with prefill
+  const [picksEventName, setPicksEventName] = useState(null);
   const { preference, resolved, cycle } = useTheme();
 
   // Resolve logged-in user to a player record (collaborators only)
@@ -83,17 +86,26 @@ function FantasyOlympicsLanding() {
       <div className="min-h-screen bg-surface-page">
         {/* Hero Section */}
         <LandingHero
-          onMakeMyPicks={() => setShowPicksModal(true)}
+          onMakeMyPicks={() => setPicksEventName('')}
           currentPlayer={currentPlayer}
           currentPlayerRank={currentPlayerRank}
           totalPlayers={totalPlayers}
         />
 
+        {/* What's On - Live & upcoming events */}
+        <UpcomingEvents
+          onMakeMyPicks={() => setPicksEventName('')}
+          onPickEvent={(eventName) => setPicksEventName(eventName)}
+        />
+
         {/* Stats Section - Medal Count & Leaderboard */}
         <section className="py-12 px-4 sm:px-8">
-          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <MedalCountCard />
             <LeaderboardCard />
+          </div>
+          <div className="mt-6">
+            <AthleteLeaderboardCard />
           </div>
         </section>
 
@@ -107,11 +119,14 @@ function FantasyOlympicsLanding() {
           </div>
         </section>
 
-        {/* 2022 Beijing Recap - Historical Data */}
-        <Beijing2022Recap />
-
         {/* Events Board */}
-        <EventsBoard onMakeMyPicks={() => setShowPicksModal(true)} />
+        <EventsBoard
+          onMakeMyPicks={() => setPicksEventName('')}
+          onPickEvent={(eventName) => setPicksEventName(eventName)}
+        />
+
+        {/* 2022 Beijing Recap - Historical Context (collapsed by default) */}
+        <Beijing2022Recap />
 
         {/* Builder Section */}
         <BuilderSection />
@@ -146,9 +161,10 @@ function FantasyOlympicsLanding() {
           </p>
         </footer>
 
-        {showPicksModal && (
+        {picksEventName !== null && (
           <PicksChoiceModal
-            onClose={() => setShowPicksModal(false)}
+            eventName={picksEventName}
+            onClose={() => setPicksEventName(null)}
           />
         )}
       </div>

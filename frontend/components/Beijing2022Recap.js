@@ -21,7 +21,7 @@ const COUNTRY_NAME_FIELDS = [
 ];
 
 export function Beijing2022Recap() {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const base = useBase();
   const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
@@ -63,11 +63,11 @@ export function Beijing2022Recap() {
   }
 
   return (
-    <section className="py-8 px-4 sm:px-8 bg-surface-page">
+    <section className="py-6 px-4 sm:px-8 bg-surface-page">
       <div className="max-w-5xl mx-auto">
         {/* Collapsed Header - Always visible */}
         <div
-          className="flex items-center justify-between cursor-pointer"
+          className="flex items-center justify-between cursor-pointer group"
           onClick={() => setIsExpanded(!isExpanded)}
           role="button"
           tabIndex={0}
@@ -79,22 +79,25 @@ export function Beijing2022Recap() {
           }}
           aria-expanded={isExpanded}
         >
-          <div>
-            <h2 className="text-xl font-display font-semibold text-secondary">
-              Beijing 2022 Recap
-            </h2>
-            <p className="text-sm text-muted">
-              See how the last Winter Olympics played out
-            </p>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted">{isExpanded ? '\u25BC' : '\u25B6'}</span>
+            <div>
+              <h3 className="text-base font-medium text-tertiary group-hover:text-secondary transition-colors">
+                Beijing 2022 Recap
+              </h3>
+              <p className="text-xs text-muted">
+                How the last Winter Olympics played out
+              </p>
+            </div>
           </div>
           <button
-            className="px-4 py-2 text-blue-blue hover:bg-blue-blueLight3 dark:hover:bg-blue-blueDark1/20 rounded-lg transition-colors text-sm font-medium"
+            className="px-3 py-1.5 text-muted hover:text-blue-blue hover:bg-blue-blueLight3 dark:hover:bg-blue-blueDark1/20 rounded-lg transition-colors text-xs font-medium"
             onClick={(e) => {
               e.stopPropagation();
               setIsExpanded(!isExpanded);
             }}
           >
-            {isExpanded ? 'Hide Results' : 'View 2022 Results'}
+            {isExpanded ? 'Hide' : 'View Results'}
           </button>
         </div>
 
@@ -157,10 +160,10 @@ export function Beijing2022Recap() {
 
 function StatCard({ label, value, subtitle }) {
   return (
-    <div className="bg-surface rounded-lg p-4 text-center shadow-theme-sm border border-light">
-      <div className="text-2xl font-bold text-blue-blue">{value}</div>
-      <div className="text-xs text-tertiary uppercase tracking-wide">{label}</div>
-      {subtitle && <div className="text-xs text-muted mt-1">{subtitle}</div>}
+    <div className="bg-surface-page rounded-lg p-3 text-center border border-light">
+      <div className="text-lg font-semibold text-tertiary">{value}</div>
+      <div className="text-xs text-muted uppercase tracking-wide">{label}</div>
+      {subtitle && <div className="text-xs text-muted mt-0.5">{subtitle}</div>}
     </div>
   );
 }

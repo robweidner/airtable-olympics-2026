@@ -1,8 +1,11 @@
 /**
- * BuilderSection - "Build Something Amazing" with narrative intro,
+ * BuilderSection - "Build Something Amazing" with live Data Wall stats,
  * sync explainer, three tiers (sync modal, inspiration, clone), and community spotlight.
  */
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useBase, useRecords } from '@airtable/blocks/interface/ui';
+import { TABLE_IDS, FIELD_IDS } from '../constants';
+import { getNumberField } from '../helpers';
 import { CommunitySpotlight } from './CommunitySpotlight';
 
 // Base ID used to construct share + embed URLs
@@ -43,6 +46,38 @@ const GITHUB_REPO = 'https://github.com/robweidner/airtable-olympics-2026';
 export function BuilderSection() {
   const [showSyncModal, setShowSyncModal] = useState(false);
 
+  // Live data queries for the Data Wall
+  const base = useBase();
+  const athletesTable = base.getTableByIdIfExists(TABLE_IDS.ATHLETES);
+  const countriesTable = base.getTableByIdIfExists(TABLE_IDS.COUNTRIES);
+  const eventsTable = base.getTableByIdIfExists(TABLE_IDS.EVENTS);
+  const sportsTable = base.getTableByIdIfExists(TABLE_IDS.SPORTS);
+
+  const athleteRecords = useRecords(athletesTable);
+  const countryRecords = useRecords(countriesTable);
+  const eventRecords = useRecords(eventsTable, { fields: [FIELD_IDS.EVENTS.STATUS, FIELD_IDS.EVENTS.YEAR] });
+  const sportRecords = useRecords(sportsTable);
+
+  // Compute live stats
+  const stats = useMemo(() => {
+    const events2026 = (eventRecords || []).filter(
+      (r) => getNumberField(r, FIELD_IDS.EVENTS.YEAR) === 2026
+    );
+    const medalsAwarded = events2026.filter((r) => {
+      const status = r.getCellValue(FIELD_IDS.EVENTS.STATUS);
+      return status?.name === 'Final';
+    }).length;
+
+    return {
+      athletes: (athleteRecords || []).length,
+      countries: (countryRecords || []).length,
+      events: events2026.length,
+      sports: (sportRecords || []).length,
+      medalsAwarded,
+      totalEvents: events2026.length,
+    };
+  }, [athleteRecords, countryRecords, eventRecords, sportRecords]);
+
   return (
     <section
       id="builder-section"
@@ -54,21 +89,14 @@ export function BuilderSection() {
           Build Something Amazing
         </h2>
 
-        {/* Narrative Intro */}
-        <div className="max-w-2xl mx-auto text-center mb-10">
-          <p className="text-body mb-4 leading-relaxed">
-            This isn&apos;t a static dataset. Every 15 minutes, Airtable&apos;s
-            built-in sync pulls fresh results from our live base &mdash; medal
-            counts, event statuses, athlete performances. You sync it once,
-            and it stays current throughout the entire Olympics.
-          </p>
-          <p className="text-tertiary leading-relaxed">
-            We built this game in 48 hours to prove a point: Airtable isn&apos;t
-            just for spreadsheets. It&apos;s infrastructure you can build real
-            applications on. And we&apos;re opening up the data for anyone to
-            build on.
-          </p>
-        </div>
+        {/* Data Wall — Live Stats */}
+        <DataWall stats={stats} />
+
+        {/* Narrative Intro — shortened, stats do the heavy lifting */}
+        <p className="max-w-2xl mx-auto text-center text-tertiary leading-relaxed mb-10">
+          Live data from the 2026 Milano Cortina Winter Olympics. Sync any table
+          to your base &mdash; results update every 15 minutes as medals are awarded.
+        </p>
 
         {/* How Sync Works — 3-step visual explainer */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-12 px-4">
@@ -163,6 +191,45 @@ export function BuilderSection() {
         <SyncModal onClose={() => setShowSyncModal(false)} />
       )}
     </section>
+  );
+}
+
+/**
+ * DataWall - Live stats banner showcasing the scale of the dataset
+ */
+function DataWall({ stats }) {
+  const items = [
+    { value: stats.athletes.toLocaleString(), label: 'Athletes' },
+    { value: stats.countries.toLocaleString(), label: 'Countries' },
+    { value: stats.events.toLocaleString(), label: 'Events' },
+    { value: stats.sports.toLocaleString(), label: 'Sports' },
+    {
+      value: `${stats.medalsAwarded}/${stats.totalEvents}`,
+      label: 'Medals Awarded',
+      highlight: true,
+    },
+    { value: '7', label: 'Tables' },
+  ];
+
+  return (
+    <div className="bg-surface-raised border border-default rounded-xl p-6 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+        {items.map((item) => (
+          <div key={item.label} className="text-center">
+            <div
+              className={`text-3xl sm:text-4xl font-bold tabular-nums ${
+                item.highlight ? 'text-yellow-500' : 'text-primary'
+              }`}
+            >
+              {item.value}
+            </div>
+            <div className="text-xs text-muted uppercase tracking-wide mt-1">
+              {item.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

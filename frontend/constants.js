@@ -7,6 +7,7 @@ export const TABLE_IDS = {
   EVENTS: 'tblfcCI7cZqIc06qD',
   PICKS: 'tblqQv8qrZXulR28g',
   SPORTS: 'tbl9zaGk0SPF4ru5I',
+  ATHLETES: 'tblTvbKFJ7cEvh8mb',
   OLYMPIC_NEWS: 'tblGjVfL3kPgeeChU',
   COMMUNITY_BUILDS: 'tblOb86DI2QWNZGkH',
 };
@@ -32,12 +33,17 @@ export const FIELD_IDS = {
     NAME: 'fldb43P9bv3dqKPVO',            // "Event Name"
     SPORT: 'fldGXQoyPOMoybQLc',           // Link to Sports
     DATE: 'fldAg9QHylhrQcPHr',
-    STATUS: 'fldyXuvmxMH8av5J9',
+    STATUS: 'fldTDv0CQCxjH8OPO',          // Formula: Event Time Status (auto from date)
     VENUE: 'fldGkYYWMuFsSBD2D',
     YEAR: 'fldrpIaMq7BhZjvWY',            // Olympic year (2022, 2026)
     GOLD_COUNTRY: 'fldh3upqaAPGFeUZ5',    // Link to Countries
     SILVER_COUNTRY: 'fldZgAPPwZ3jGENIn',   // Link to Countries
     BRONZE_COUNTRY: 'fldxOaYaxe19hI902',   // Link to Countries
+    GOLD_ATHLETE: 'fldCsIFzXJHPOGOX9',    // Link to Athletes
+    SILVER_ATHLETE: 'fldBZmnj57Yfkq4qM',  // Link to Athletes
+    BRONZE_ATHLETE: 'fldl6TYmWzKtvRD5W',  // Link to Athletes
+    SPORT_ICON: 'fldfJ2QZqc4yFwOBY',      // Lookup: Icon (from Sport)
+    SPORT_NAME: 'fldn28wyUpF3egOUB',       // Lookup: Sport Name (from Sport)
   },
   PICKS: {
     PLAYER: 'fldZIjdo1Cuqj2t3Q',           // Link to Players
@@ -46,6 +52,23 @@ export const FIELD_IDS = {
     SILVER_COUNTRY: 'fldYuucm0IVghCCaV',   // Link to Countries
     BRONZE_COUNTRY: 'fld62OdLcQ3WjLqZI',   // Link to Countries
     TOTAL_PICK_POINTS: 'fld360tX1Px7sUAAo', // Formula: sum of position points
+  },
+  ATHLETES: {
+    NAME: 'fldIWOpSSZU2omrT1',
+    COUNTRY: 'fldtZ9YMODYPphpcs',         // Link to Countries
+    NOC_CODE: 'fldawQ7zl7KasLHW4',        // Lookup from Country
+    BORN_DATE: 'fldcnmQmriqZynr5M',
+    CURRENT_AGE: 'fldIa8LBETtvXr97N',     // Formula
+    PROFILE_URL: 'fldPeoyCaQr6An4Ka',     // Olympics profile link
+    SPORT: 'fld3J0dOuFJ4nuYYV',           // Rollup from Event → Sport
+    COUNTRY_NAME: 'fldq2OIF8isDmGFL5',    // Lookup: Country name
+    GOLD_MEDALS: 'fld6vXzRqcjkNFCZ2',     // Rollup
+    SILVER_MEDALS: 'fldPw3dUKQC5wzSi2',   // Rollup
+    BRONZE_MEDALS: 'fldZ7RbqHs4MlRc3a',   // Rollup
+    TOTAL_MEDALS: 'fldX3UZgbD487sV6g',    // Rollup
+    GOLD_EVENTS: 'fldTUsH9tWD0DKIWp',     // Rollup: event names
+    SILVER_EVENTS: 'fldoVbImNLITeM4aW',   // Rollup: event names
+    BRONZE_EVENTS: 'fldkCz39pSn4ittC1',   // Rollup: event names
   },
   SPORTS: {
     NAME: 'fldE3FUUczhsQ0J0f',            // "Sport Name"
@@ -87,3 +110,6 @@ export const INTERFACE_URL = 'https://airtable.com/appoY3nwpfUnUut4P/shr5PXjBZxD
 
 // Community Builds submission form — update with actual form URL after creating in Airtable UI
 export const COMMUNITY_BUILDS_FORM_URL = 'https://airtable.com/appoY3nwpfUnUut4P/pagUNnfD04Cz5Kz0H/form';
+
+// Total medal events in 2026 Winter Olympics
+export const TOTAL_2026_EVENTS = 116;

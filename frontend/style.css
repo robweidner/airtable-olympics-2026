@@ -144,3 +144,28 @@
   background-color: rgb(var(--color-surface));
   color: rgb(var(--color-text-primary));
 }
+
+/* Medal bounce animation for empty state placeholders */
+@keyframes medal-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.medal-bounce {
+  animation: medal-bounce 1.5s ease-in-out infinite;
+}
+
+/* Schedule row stagger animation */
+@keyframes schedule-slide-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.schedule-row-enter {
+  animation: schedule-slide-in 0.25s ease-out both;
+}
+
+/* Tabular (monospace) numbers for timestamps */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
