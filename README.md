@@ -144,12 +144,57 @@ One-click sync links to add live Olympic data to your own Airtable base. Data re
 
 ---
 
+## Forking This Project
+
+Want to run your own version of Fantasy Olympics? Here's how to set up the extension against your own Airtable base.
+
+### Prerequisites
+
+- Node 18+
+- An Airtable base with tables that match this project's structure (same table and field names)
+- A [Personal Access Token](https://airtable.com/create/tokens) with the `schema.bases:read` scope
+
+### Setup
+
+```bash
+git clone https://github.com/robweidner/airtable-olympics-2026.git
+cd airtable-olympics-2026
+npm install
+node scripts/setup.js
+```
+
+The setup script will prompt for your **Base ID** and **Personal Access Token**, then automatically rewrite all table and field IDs in `frontend/constants.js` and component files to match your base's schema.
+
+You can also pass credentials as environment variables:
+
+```bash
+AIRTABLE_PAT=patXXX AIRTABLE_BASE_ID=appXXX node scripts/setup.js
+```
+
+### Manual Steps After Setup
+
+The script handles table/field IDs and base IDs automatically, but a few values are unique to your Airtable installation:
+
+1. **Share link tokens** (`shr...`) in `frontend/components/BuilderSection.js` — create shared views for each table, then replace the 7 tokens in the `ALL_TABLES` array
+2. **Form page IDs** (`pag...`) in `frontend/constants.js` — create Interface forms for picks, registration, and community builds, then update `PICKS_FORM_URL`, `REGISTRATION_FORM_URL`, and `COMMUNITY_BUILDS_FORM_URL`
+3. **Interface share link** (`shr...`) — update `INTERFACE_URL` in `frontend/constants.js` and `shareUrl` in `frontend/components/ShareBanner.js`
+4. **PostHog API key** (optional) in `frontend/analytics.js` — replace with your own key, or remove the analytics integration
+
+### Test It
+
+```bash
+npx block run --port 9000    # Start dev server
+```
+
+---
+
 ## Development
 
-This is an Airtable Interface Extension — not a standalone web app. There's no `npm start` or dev server. Development and preview happen within the Airtable workspace.
+This is an Airtable Interface Extension built with the `@airtable/blocks` SDK.
 
 ```bash
 npm install                  # Install dependencies
+npx block run --port 9000   # Start local dev server
 npm run lint                 # ESLint across frontend/
 ```
 
@@ -166,7 +211,7 @@ frontend/
 
 ### Key Conventions
 
-- **Field/table IDs over names** — All Airtable references use stable IDs (`tbl*`, `fld*`) defined in `constants.js`. Names can be renamed by users; IDs can't.
+- **Field/table IDs over names** — All Airtable references use stable IDs (`tbl*`, `fld*`) defined in `constants.js`. Run `node scripts/setup.js` to remap IDs to your own base.
 - **SDK import paths** — Only `@airtable/blocks/interface/ui` and `@airtable/blocks/interface/models`. Other paths will break.
 - **No UI library** — All components are custom-built with Tailwind. Airtable Blocks UI components (`Box`, etc.) aren't supported in Interface Extensions.
 - **React 19** — Use `--legacy-peer-deps` when adding new packages.

@@ -5,4 +5,4 @@
 .env.*
 .DS_Store
 .tmp/
-.block/.block/
+.block/
