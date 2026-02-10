@@ -1,8 +1,9 @@
 import { initializeBlock, useBase, useRecords, useSession } from '@airtable/blocks/interface/ui';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './style.css';
 import { TABLE_IDS, FIELD_IDS } from './constants';
 import { getStringField, getNumberField, getCellValueSafe } from './helpers';
+import { initAnalytics, identifyUser, track, trackPageView } from './analytics';
 
 import { LandingHero } from './components/LandingHero';
 import { MedalCountCard } from './components/MedalCountCard';
@@ -108,13 +109,25 @@ function FantasyOlympicsLanding() {
 
   const totalPlayers = playerRecords?.length || 0;
 
+  // --- Analytics ---
+  useEffect(() => { initAnalytics(); }, []);
+
+  // Identify user once session + player data are available
+  useEffect(() => {
+    if (!session.currentUser) return;
+    identifyUser(session.currentUser, currentPlayer);
+  }, [session.currentUser, currentPlayer]);
+
+  // Track page navigations
+  useEffect(() => { trackPageView(currentPage); }, [currentPage]);
+
   return (
     <div className={resolved === 'dark' ? 'dark' : ''}>
       {currentPage === 'home' && (
         <div className="min-h-screen bg-surface-page">
           {/* Hero Section */}
           <LandingHero
-            onMakeMyPicks={() => setCurrentPage('schedule')}
+            onMakeMyPicks={() => { track('picks_cta_clicked', { source: 'hero' }); setCurrentPage('schedule'); }}
             currentPlayer={currentPlayer}
             currentPlayerRank={currentPlayerRank}
             totalPlayers={totalPlayers}
@@ -123,9 +136,9 @@ function FantasyOlympicsLanding() {
 
           {/* What's On - Live & upcoming events */}
           <UpcomingEvents
-            onMakeMyPicks={() => setPicksEventName('')}
-            onPickEvent={(eventName) => setPicksEventName(eventName)}
-            onNavigateToSchedule={() => setCurrentPage('schedule')}
+            onMakeMyPicks={() => { track('picks_cta_clicked', { source: 'upcoming_events' }); setPicksEventName(''); }}
+            onPickEvent={(eventName) => { track('event_picked', { event: eventName, source: 'upcoming_events' }); setPicksEventName(eventName); }}
+            onNavigateToSchedule={() => { track('schedule_navigated', { source: 'upcoming_events' }); setCurrentPage('schedule'); }}
           />
 
           {/* Stats Section - Olympics Results (left) vs Fantasy Game (right) */}
@@ -163,7 +176,7 @@ function FantasyOlympicsLanding() {
                   </div>
                 </div>
                 <LeaderboardCard />
-                <FantasyCallToAction onMakeMyPicks={() => setCurrentPage('schedule')} />
+                <FantasyCallToAction onMakeMyPicks={() => { track('picks_cta_clicked', { source: 'fantasy_section' }); setCurrentPage('schedule'); }} />
                 <CommunitySpotlight />
               </div>
 
@@ -180,8 +193,8 @@ function FantasyOlympicsLanding() {
 
           {/* Events Board */}
           <EventsBoard
-            onMakeMyPicks={() => setCurrentPage('schedule')}
-            onPickEvent={(eventName) => setPicksEventName(eventName)}
+            onMakeMyPicks={() => { track('picks_cta_clicked', { source: 'events_board' }); setCurrentPage('schedule'); }}
+            onPickEvent={(eventName) => { track('event_picked', { event: eventName, source: 'events_board' }); setPicksEventName(eventName); }}
           />
 
           {/* 2022 Beijing Recap - Historical Context (collapsed by default) */}
@@ -224,7 +237,7 @@ function FantasyOlympicsLanding() {
 
       {currentPage === 'schedule' && (
         <FullSchedulePage
-          onPickEvent={(eventName) => setPicksEventName(eventName)}
+          onPickEvent={(eventName) => { track('event_picked', { event: eventName, source: 'schedule' }); setPicksEventName(eventName); }}
           onBack={() => { setCurrentPage('home'); window.scrollTo(0, 0); }}
         />
       )}

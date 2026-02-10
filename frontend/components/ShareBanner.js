@@ -2,11 +2,14 @@
  * ShareBanner - Lightweight prompt encouraging users to share with friends.
  * Placed after the leaderboard to capitalize on competitive curiosity.
  */
+import { track } from '../analytics';
+
 export function ShareBanner() {
   const shareUrl = 'https://airtable.com/appoY3nwpfUnUut4P/shr5PXjBZxDFwwtEp';
   const shareText = 'I\'m playing Fantasy Olympics for Milano-Cortina 2026! Predict the podium and see if you can beat me on the leaderboard.';
 
   const handleCopyLink = () => {
+    track('share_clicked', { method: 'copy_link' });
     navigator.clipboard.writeText(shareUrl).catch(() => {
       // Fallback: select a temporary input (clipboard API not available in all Airtable contexts)
       const input = document.createElement('input');
@@ -39,6 +42,7 @@ export function ShareBanner() {
           </button>
           <a
             href={`mailto:?subject=${encodeURIComponent('Play Fantasy Olympics with me!')}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`}
+            onClick={() => track('share_clicked', { method: 'email' })}
             className="px-4 py-2 bg-blue-blue hover:bg-blue-blueDark1 text-white text-sm font-medium rounded-lg transition-colors inline-flex items-center"
           >
             Email a Friend

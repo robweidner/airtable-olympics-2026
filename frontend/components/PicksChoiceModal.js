@@ -3,9 +3,16 @@
  * Embeds the Airtable picks form directly in a full-screen modal.
  * Optionally prefills the Event field when opened from a specific event.
  */
+import { useEffect } from 'react';
+import { track } from '../analytics';
+
 const BASE_FORM_URL = 'https://airtable.com/embed/appoY3nwpfUnUut4P/pagzkW6PMYY37XHaB/form';
 
 export function PicksChoiceModal({ eventName, onClose }) {
+  useEffect(() => {
+    track('picks_modal_opened', { event: eventName || 'browse_all' });
+  }, [eventName]);
+
   // Build the iframe URL, optionally prefilling the Event linked record field
   let src = BASE_FORM_URL;
   if (eventName) {

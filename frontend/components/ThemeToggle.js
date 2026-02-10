@@ -7,6 +7,7 @@
  * ThemeToggle renders a fixed bottom-right button that cycles through modes.
  */
 import { useState, useEffect, useCallback } from 'react';
+import { track } from '../analytics';
 
 const STORAGE_KEY = 'fantasy-olympics-theme';
 const MODES = ['light', 'dark', 'auto'];
@@ -73,7 +74,9 @@ export function useTheme() {
   const cycle = useCallback(() => {
     setPreference((prev) => {
       const idx = MODES.indexOf(prev);
-      return MODES[(idx + 1) % MODES.length];
+      const next = MODES[(idx + 1) % MODES.length];
+      track('theme_toggled', { from: prev, to: next });
+      return next;
     });
   }, []);
 
