@@ -123,7 +123,6 @@ One-click sync links to add live Olympic data to your own Airtable base. Data re
 | Athletes | [Sync to your base](https://airtable.com/appoY3nwpfUnUut4P/shraFpEmwrY7LBjh6) |
 | Sports | [Sync to your base](https://airtable.com/appoY3nwpfUnUut4P/shrJxONmCYd2i3IAM) |
 | Events | [Sync to your base](https://airtable.com/appoY3nwpfUnUut4P/shrAK9nlSAX51L7S2) |
-| Results | [Sync to your base](https://airtable.com/appoY3nwpfUnUut4P/shrYpNoFK6wEg2JP6) |
 | Players | [Sync to your base](https://airtable.com/appoY3nwpfUnUut4P/shrEwciwYyPOa8oFc) |
 | Picks | [Sync to your base](https://airtable.com/appoY3nwpfUnUut4P/shrTXGgyVl0FJ77Sa) |
 
