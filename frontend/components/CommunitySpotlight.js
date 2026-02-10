@@ -7,6 +7,7 @@ import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS, COMMUNITY_BUILDS_FORM_URL } from '../constants';
 import { getStringField, getNumberField, getCellValueSafe } from '../helpers';
+import { track } from '../analytics';
 
 const CB = FIELD_IDS.COMMUNITY_BUILDS;
 
@@ -72,6 +73,7 @@ function EmptyState() {
           href={COMMUNITY_BUILDS_FORM_URL}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track('community_submit_clicked', { source: 'empty_state' })}
           className="text-blue-blue hover:text-blue-blueDark1 font-medium"
         >
           Submit your build {'\u2192'}
@@ -123,6 +125,7 @@ function CommunitySpotlightInner({ table }) {
           href={COMMUNITY_BUILDS_FORM_URL}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track('community_submit_clicked', { source: 'header' })}
           className="text-sm text-blue-blue hover:text-blue-blueDark1 font-medium whitespace-nowrap"
         >
           Submit yours {'\u2192'}
@@ -134,7 +137,7 @@ function CommunitySpotlightInner({ table }) {
           <BuildRow
             key={build.id}
             build={build}
-            onClick={() => setSelectedBuild(build)}
+            onClick={() => { track('community_build_clicked', { build: build.title, category: build.category }); setSelectedBuild(build); }}
           />
         ))}
       </div>
@@ -273,6 +276,7 @@ function BuildDetailModal({ build, onClose }) {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track('community_build_link_clicked', { build: build.title, link_type: link.label })}
                   className="inline-flex items-center gap-1 py-2 px-3 bg-blue-blueLight2 hover:bg-blue-blueLight1 text-blue-blueDark1 text-sm font-medium rounded-md transition-colors"
                 >
                   {link.label} {'\u2192'}

@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import { TABLE_IDS, FIELD_IDS, TOTAL_2026_EVENTS } from '../constants';
 import { mapRecordToCountry, computeMedalCounts, computeCountryEventMedals, getNumberField, getCellValueSafe } from '../helpers';
 import { RankBadge, LiveBadge, MedalBadge, YearToggle } from './shared';
+import { track } from '../analytics';
 
 // Fields needed from Events table to compute medals
 const EVENT_MEDAL_FIELDS = [
@@ -127,7 +128,7 @@ export function MedalCountCard() {
       </div>
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm text-muted">{yearLabel}</p>
-        <YearToggle value={yearFilter} onChange={(y) => { setYearFilter(y); setExpandedCountryId(null); }} />
+        <YearToggle value={yearFilter} onChange={(y) => { track('year_filter_changed', { year: y, component: 'medal_count' }); setYearFilter(y); setExpandedCountryId(null); }} />
       </div>
 
       {/* Progress bar (always shows 2026 progress) */}
@@ -141,7 +142,7 @@ export function MedalCountCard() {
           return (
             <div key={country.id}>
               <div
-                onClick={() => setExpandedCountryId(isExpanded ? null : country.id)}
+                onClick={() => { if (!isExpanded) track('medal_country_expanded', { country: country.name }); setExpandedCountryId(isExpanded ? null : country.id); }}
                 className={`flex items-center justify-between py-3 px-3 rounded-md cursor-pointer transition-colors ${
                   index === 0
                     ? 'bg-yellow-yellowLight3 border border-yellow-yellowLight1 hover:bg-yellow-yellowLight2 dark:bg-yellow-yellowDark1/20 dark:border-yellow-yellowDark1/40 dark:hover:bg-yellow-yellowDark1/30'

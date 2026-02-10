@@ -9,6 +9,7 @@ import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToPlayer } from '../helpers';
 import { PlayerPicksModal } from './PlayerPicksModal';
 import { RankBadge, LiveBadge } from './shared';
+import { track } from '../analytics';
 
 const PLAYER_FIELDS = [
   FIELD_IDS.PLAYERS.NAME,
@@ -71,7 +72,7 @@ export function LeaderboardCard() {
         {topPlayers.map((player, index) => (
           <div
             key={player.id}
-            onClick={() => setSelectedPlayer(player)}
+            onClick={() => { track('player_profile_clicked', { player: player.name, rank: index + 1 }); setSelectedPlayer(player); }}
             className={`flex items-center justify-between py-3 px-3 rounded-md cursor-pointer transition-colors ${
               index === 0
                 ? 'bg-yellow-yellowLight3 border border-yellow-yellowLight1 hover:bg-yellow-yellowLight2 dark:bg-yellow-yellowDark1/20 dark:border-yellow-yellowDark1/40 dark:hover:bg-yellow-yellowDark1/30'

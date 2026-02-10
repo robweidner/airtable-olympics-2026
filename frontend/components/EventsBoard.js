@@ -8,6 +8,7 @@ import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { useState, useMemo } from 'react';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToEvent, mapRecordToSport } from '../helpers';
+import { track } from '../analytics';
 
 const SPORT_FIELDS = [
   FIELD_IDS.SPORTS.NAME,
@@ -39,7 +40,9 @@ export function EventsBoard({ onMakeMyPicks, onPickEvent }) {
 
   const [expandedSportId, setExpandedSportId] = useState(null);
 
-  const handleSportClick = (sportId) => {
+  const handleSportClick = (sportId, sportName) => {
+    const expanding = expandedSportId !== sportId;
+    if (expanding) track('sport_expanded', { sport: sportName });
     setExpandedSportId(prev => prev === sportId ? null : sportId);
   };
 
@@ -126,7 +129,7 @@ export function EventsBoard({ onMakeMyPicks, onPickEvent }) {
               sport={sport}
               events={eventsBySport[sport.id] ?? []}
               isExpanded={expandedSportId === sport.id}
-              onToggle={() => handleSportClick(sport.id)}
+              onToggle={() => handleSportClick(sport.id, sport.name)}
               onMakeMyPicks={onMakeMyPicks}
               onPickEvent={onPickEvent}
             />

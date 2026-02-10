@@ -6,6 +6,7 @@ import { useState, useMemo } from 'react';
 import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToCountry, computeMedalCounts } from '../helpers';
+import { track } from '../analytics';
 
 // Fields needed from Events to compute 2022 medals
 const EVENT_MEDAL_FIELDS = [
@@ -68,12 +69,13 @@ export function Beijing2022Recap() {
         {/* Collapsed Header - Always visible */}
         <div
           className="flex items-center justify-between cursor-pointer group"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => { if (!isExpanded) track('beijing_recap_toggled', { action: 'expand' }); setIsExpanded(!isExpanded); }}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
+              if (!isExpanded) track('beijing_recap_toggled', { action: 'expand' });
               setIsExpanded(!isExpanded);
             }
           }}

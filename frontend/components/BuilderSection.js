@@ -7,6 +7,7 @@ import { useBase, useRecords } from '@airtable/blocks/interface/ui';
 import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { getNumberField, getStringField, computeEventStatus, getCellValueSafe } from '../helpers';
 import { CommunitySpotlight } from './CommunitySpotlight';
+import { track } from '../analytics';
 
 // Base ID used to construct share + embed URLs
 const BASE_ID = 'appoY3nwpfUnUut4P';
@@ -142,7 +143,7 @@ export function BuilderSection() {
             ]}
           >
             <button
-              onClick={() => setShowSyncModal(true)}
+              onClick={() => { track('builder_explore_clicked'); setShowSyncModal(true); }}
               className="block w-full py-2.5 px-4 bg-green-green hover:bg-green-greenDark1 text-white text-center font-medium rounded-md transition-colors"
             >
               Explore the Dataset {'\u2192'}
@@ -189,6 +190,7 @@ export function BuilderSection() {
                 href={GITHUB_REPO}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => track('github_clicked')}
                 className="block w-full py-2.5 px-4 bg-purple-purple hover:bg-purple-purpleDark1 text-white text-center font-medium rounded-md transition-colors mb-3"
               >
                 View on GitHub {'\u2192'}
@@ -258,6 +260,7 @@ function DataWall({ stats }) {
  * tables are tucked into an expandable accordion.
  */
 function SyncModal({ onClose }) {
+  track('sync_modal_opened');
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -344,6 +347,7 @@ function SyncModal({ onClose }) {
                     href={`https://airtable.com/${BASE_ID}/${table.shareToken}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => track('sync_table_clicked', { table: table.label })}
                     className="inline-flex items-center gap-1.5 py-2 px-4 bg-green-green hover:bg-green-greenDark1 text-white text-sm font-medium rounded-md transition-colors"
                   >
                     Sync to My Base {'\u2192'}

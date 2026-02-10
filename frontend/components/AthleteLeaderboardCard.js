@@ -9,6 +9,7 @@ import { TABLE_IDS, FIELD_IDS } from '../constants';
 import { mapRecordToCountry, computeAthleteMedalCounts, getStringField } from '../helpers';
 import { RankBadge, LiveBadge, MedalBadge, YearToggle } from './shared';
 import { AthleteProfileModal } from './AthleteProfileModal';
+import { track } from '../analytics';
 
 // Fields needed from Events to compute athlete medals
 const EVENT_ATHLETE_FIELDS = [
@@ -104,7 +105,7 @@ export function AthleteLeaderboardCard() {
         </div>
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-muted">{yearLabel}</p>
-          <YearToggle value={yearFilter} onChange={setYearFilter} />
+          <YearToggle value={yearFilter} onChange={(y) => { track('year_filter_changed', { year: y, component: 'athlete_leaderboard' }); setYearFilter(y); }} />
         </div>
         <div className="text-center py-6">
           <span className="text-3xl">&#9975;&#65039;</span>
@@ -124,7 +125,7 @@ export function AthleteLeaderboardCard() {
       </div>
       <div className="flex items-center justify-between mb-4">
         <p className="text-sm text-muted">{yearLabel}</p>
-        <YearToggle value={yearFilter} onChange={setYearFilter} />
+        <YearToggle value={yearFilter} onChange={(y) => { track('year_filter_changed', { year: y, component: 'athlete_leaderboard' }); setYearFilter(y); }} />
       </div>
 
       <div>
@@ -143,7 +144,7 @@ export function AthleteLeaderboardCard() {
           {topAthletes.map((athlete, index) => (
             <div
               key={athlete.id}
-              onClick={() => setSelectedAthleteId(athlete.id)}
+              onClick={() => { track('athlete_profile_clicked', { athlete: athlete.name, rank: index + 1 }); setSelectedAthleteId(athlete.id); }}
               className={`flex sm:grid ${GRID_COLS} gap-2 items-center py-3 px-3 rounded-md cursor-pointer transition-colors ${
                 index === 0
                   ? 'bg-yellow-yellowLight3 border border-yellow-yellowLight1 hover:bg-yellow-yellowLight2 dark:bg-yellow-yellowDark1/20 dark:border-yellow-yellowDark1/40 dark:hover:bg-yellow-yellowDark1/30'
