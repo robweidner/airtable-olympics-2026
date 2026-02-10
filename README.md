@@ -148,6 +148,8 @@ One-click sync links to add live Olympic data to your own Airtable base. Data re
 
 Want to run your own version of Fantasy Olympics? Here's how to set up the extension against your own Airtable base.
 
+> The fork-friendly setup script was inspired by a suggestion from [Dan Fellars](https://www.linkedin.com/in/dan-danny-fellars-a691202/) of [On2Air](https://on2air.com/), who pointed out that forking didn't work out of the box because of all the hardcoded Airtable IDs.
+
 ### Prerequisites
 
 - Node 18+
@@ -196,6 +198,14 @@ This is an Airtable Interface Extension built with the `@airtable/blocks` SDK.
 npm install                  # Install dependencies
 npx block run --port 9000   # Start local dev server
 npm run lint                 # ESLint across frontend/
+```
+
+### Airtable Skills for Claude Code
+
+If you're using [Claude Code](https://claude.ai/code), the [Airtable Skills](https://github.com/robweidner/airtable-skills) plugin turns Claude into an Airtable specialist — schema design, scripting, automations, and custom extension development with the Blocks SDK and Interface Extensions SDK. Useful for working on this project or building on Airtable in general.
+
+```bash
+claude install-skill https://github.com/robweidner/airtable-skills
 ```
 
 ### Project Structure
