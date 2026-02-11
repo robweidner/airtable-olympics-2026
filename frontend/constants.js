@@ -95,6 +95,7 @@ export const FIELD_IDS = {
     BASE_LINK: 'fldMRdvvJpHYjD5MB',
     MODERATION_STATUS: 'fldtfjPLIl7JxCNYY',      // Single select: Pending Review, Approved, Featured, Rejected
     FEATURE_ORDER: 'fldmxTYx4xGEc9ggs',
+    ANONYMOUS: 'fldx3EpNsI9Kvhkpy',            // Checkbox: hide builder name from public display
   },
 };
 

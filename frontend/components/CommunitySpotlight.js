@@ -22,6 +22,7 @@ const BUILD_FIELDS = [
   CB.BASE_LINK,
   CB.MODERATION_STATUS,
   CB.FEATURE_ORDER,
+  CB.ANONYMOUS,
 ];
 
 const CATEGORY_STYLES = {
@@ -51,6 +52,7 @@ function mapRecordToBuild(record) {
     interfaceLink: getStringField(record, CB.INTERFACE_LINK),
     baseLink: getStringField(record, CB.BASE_LINK),
     featureOrder: getNumberField(record, CB.FEATURE_ORDER),
+    anonymous: !!getCellValueSafe(record, CB.ANONYMOUS),
   };
 }
 
@@ -187,7 +189,9 @@ function BuildRow({ build, onClick }) {
             <span className="text-yellow-yellow text-xs flex-shrink-0">{'\u2605'}</span>
           )}
         </div>
-        <span className="text-xs text-muted">by {build.builderName}</span>
+        {!build.anonymous && build.builderName && (
+          <span className="text-xs text-muted">by {build.builderName}</span>
+        )}
       </div>
       {build.category && (
         <span
@@ -232,7 +236,9 @@ function BuildDetailModal({ build, onClose }) {
                 <span className="text-yellow-yellow flex-shrink-0">{'\u2605'}</span>
               )}
             </div>
-            <p className="text-sm text-muted">by {build.builderName}</p>
+            {!build.anonymous && build.builderName && (
+              <p className="text-sm text-muted">by {build.builderName}</p>
+            )}
           </div>
           <button
             onClick={onClose}
