@@ -9,7 +9,7 @@
 import posthog from 'posthog-js';
 
 // Replace with your PostHog project API key
-const POSTHOG_KEY = 'phc_NcCjnWCBdl2qk0L3QfMQ1QYT3gjwt9KoZy4Kq5nhlOL';
+const POSTHOG_KEY = '__POSTHOG_API_KEY__';
 const POSTHOG_HOST = 'https://us.i.posthog.com';
 
 let initialized = false;

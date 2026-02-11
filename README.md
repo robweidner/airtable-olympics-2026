@@ -180,7 +180,7 @@ The script handles table/field IDs and base IDs automatically, but a few values 
 1. **Share link tokens** (`shr...`) in `frontend/components/BuilderSection.js` — create shared views for each table, then replace the 7 tokens in the `ALL_TABLES` array
 2. **Form page IDs** (`pag...`) in `frontend/constants.js` — create Interface forms for picks, registration, and community builds, then update `PICKS_FORM_URL`, `REGISTRATION_FORM_URL`, and `COMMUNITY_BUILDS_FORM_URL`
 3. **Interface share link** (`shr...`) — update `INTERFACE_URL` in `frontend/constants.js` and `shareUrl` in `frontend/components/ShareBanner.js`
-4. **PostHog API key** (optional) in `frontend/analytics.js` — replace with your own key, or remove the analytics integration
+4. **PostHog API key** (optional) — the setup script prompts for this. You can also manually replace the placeholder in `frontend/analytics.js`
 
 ### Test It
 

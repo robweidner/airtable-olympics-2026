@@ -327,7 +327,20 @@ async function main() {
     }
   }
 
-  // 6. Print summary
+  // 6. Optional: PostHog analytics key
+  const posthogKey = await prompt('  PostHog API key (optional, press Enter to skip): ');
+  if (posthogKey) {
+    const analyticsPath = path.join(frontendDir, 'analytics.js');
+    let analyticsContent = fs.readFileSync(analyticsPath, 'utf-8');
+    analyticsContent = analyticsContent.replace("'__POSTHOG_API_KEY__'", `'${posthogKey}'`);
+    fs.writeFileSync(analyticsPath, analyticsContent, 'utf-8');
+    console.log(`  Updated: frontend/analytics.js (PostHog enabled)`);
+  } else {
+    console.log('  Skipped: PostHog analytics (disabled — extension works without it)');
+  }
+
+  // 7. Print summary
+  //    (renumbered from original step 6)
   console.log('\n  ── Summary ──────────────────────────────────');
   console.log(`  Base ID:    ${baseId}`);
   console.log(`  Tables:     ${Object.keys(newTableIds).length} mapped`);
@@ -343,7 +356,7 @@ async function main() {
     console.log('\n  All tables and fields matched successfully.');
   }
 
-  // 7. Print manual TODO items
+  // 8. Print manual TODO items
   console.log('\n  ── Manual Steps Required ─────────────────────');
   console.log('  The following values are unique to your installation and');
   console.log('  must be updated by hand:\n');
@@ -356,7 +369,6 @@ async function main() {
   console.log('  3. Interface share link (shr...) in:');
   console.log('     - frontend/constants.js (INTERFACE_URL)');
   console.log('     - frontend/components/ShareBanner.js (shareUrl)\n');
-  console.log('  4. PostHog API key in frontend/analytics.js (optional — for your own analytics)\n');
   console.log('  Done! Run `npx block run --port 9000` to test your extension.\n');
 }
 
